@@ -1,0 +1,17 @@
+---
+data_dir: C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\RFMiD_Training_Labels.csv
+train_imgs:
+- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
+val_imgs:
+- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
+test_imgs:
+batch_size: 16
+num_classes: 29
+model: vit_base_patch16_224
+img_size: 224
+start_col: 1
+experiment: 
+seed: 42
+num_workers: 4
+pin_memory: True
+epochs: 3
