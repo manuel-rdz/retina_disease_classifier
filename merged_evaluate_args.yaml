@@ -1,0 +1,16 @@
+---
+data_dir: C:\Users\AI\Desktop\student_Manuel\datasets\clean_merged_dataset_only_2.csv
+test_imgs:
+- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images
+- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all-images
+model_path:  C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged\20210918-220440-vit_base_patch16_224-224\model_best.pth.tar
+output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged\20210918-220440-vit_base_patch16_224-224
+model_name: vit_base_patch16_224
+batch_size: 16
+num_classes: 15
+img_size: 224
+start_col: 3
+seed: 42
+num_workers: 4
+pin_memory: True
+tta: 3

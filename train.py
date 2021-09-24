@@ -1,8 +1,8 @@
 from models import RetinaClassifier
 from iterstrat.ml_stratifiers import MultilabelStratifiedKFold
 from data.modules import RetinaDataModule
+from pytorch_lightning import Trainer, seed_everything
 
-import pytorch_lightning as pl
 import pandas as pd
 import argparse
 import yaml
@@ -47,8 +47,7 @@ def _parse_args():
 
 if __name__ == '__main__':
     args, args_text = _parse_args()
-
-    print(args)
+    seed_everything(42, workers=True)
 
     folds = MultilabelStratifiedKFold(n_splits=5, shuffle=True, random_state=args.seed)
 
@@ -68,9 +67,8 @@ if __name__ == '__main__':
 
         model = RetinaClassifier(args.model, args.num_classes)
         
-        trainer = pl.Trainer(gpus=1, deterministic=True, max_epochs=args.epochs)
+        trainer = Trainer(gpus=1, deterministic=True, max_epochs=args.epochs, limit_train_batches=5, limit_val_batches=5)
         trainer.fit(model, data_module)
-        break
 
 
 # for checkpoints

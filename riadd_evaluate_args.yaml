@@ -1,0 +1,15 @@
+---
+data_dir: C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Evaluation_Set\RFMiD_Validation_Labels.csv
+test_imgs:
+- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Evaluation_Set\Evaluation
+model_path:  C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\20210910-205105-vit_base_patch16_224-224\model_best.pth.tar
+output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\20210910-205105-vit_base_patch16_224-224
+model_name: vit_base_patch16_224
+batch_size: 16
+num_classes: 29
+img_size: 224
+start_col: 1
+seed: 42
+num_workers: 4
+pin_memory: True
+tta: 3

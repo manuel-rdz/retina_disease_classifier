@@ -3,9 +3,9 @@ import cv2
 import numpy as np
 import torch.utils.data as data
 
-from PIL import Image
 
-class RIADDDataset(data.Dataset):  # for training/testing
+# Training / Testing
+class RIADDDataset(data.Dataset):
     def __init__(self, image_ids, img_path='', transform=None, only_disease=False):
 
         self.image_ids = image_ids

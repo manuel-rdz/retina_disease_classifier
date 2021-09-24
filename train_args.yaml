@@ -12,6 +12,6 @@ img_size: 224
 start_col: 1
 experiment: 
 seed: 42
-num_workers: 4
+num_workers: 2
 pin_memory: True
 epochs: 3

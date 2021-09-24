@@ -6,6 +6,8 @@ import torchmetrics as tm
 import torch.nn as nn
 import torch
 import timm
+import numpy as np
+
 
 class RetinaClassifier(pl.LightningModule):
     def __init__(self, model_name='vit', n_classes=29, requires_grad=False):
@@ -32,6 +34,8 @@ class RetinaClassifier(pl.LightningModule):
 
         self.loss = AsymmetricLossOptimized(gamma_neg=2, gamma_pos=1)
         self.n_classes = n_classes
+
+        self.predictions = np.empty((0, n_classes), dtype=np.float32)
 
     def forward(self, x):
         return self.model(x)
@@ -62,30 +66,69 @@ class RetinaClassifier(pl.LightningModule):
 
         acc = tm.functional.accuracy(logits, y)
 
-        pbar = {'train_acc': acc}
-        print('Training acc: ', acc)
+        #self.log("train_loss", J, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log('acc', acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)  
+
+
+        #pbar = {'train_acc': acc}
         
         return {
             'loss': J,
-            'train_acc': acc,
-            'progress_bar': pbar}
+            'train_acc': acc}
+        #    'progress_bar': pbar}
     
     def validation_step(self, batch, batch_idx):
         results = self.training_step(batch, batch_idx)
-        results['progress_bar']['val_acc'] = results['progress_bar']['train_acc']
-        del results['progress_bar']['train_acc']
+        results['val_acc'] = results['train_acc']
+        del results['train_acc']
+        #results['progress_bar']['val_acc'] = results['progress_bar']['train_acc']
+        #del results['progress_bar']['train_acc']
         return results
 
     def validation_epoch_end(self, val_step_outputs):
         avg_val_loss = torch.tensor([x['loss'] for x in val_step_outputs]).mean()
-        avg_val_acc = torch.tensor([x['progress_bar']['val_acc'] for x in val_step_outputs]).mean()
+        avg_val_acc = torch.tensor([x['val_acc'] for x in val_step_outputs]).mean()
 
-        print('val auc score')
-        print(avg_val_acc)
+        #print('val auc score')
+        #print(avg_val_acc)
 
-        pbar = {'avg_val_acc': avg_val_acc}
+        self.log("avg_val_loss", avg_val_loss, on_epoch=True, prog_bar=True, logger=True)
+        self.log('avg_val_acc', avg_val_acc, on_epoch=True, prog_bar=True, logger=True)  
 
-        return {'val_loss': avg_val_loss, 'progress_bar': pbar}
+        #pbar = {'avg_val_acc': avg_val_acc}
+
+        return {'avg_val_loss': avg_val_loss,
+                'avg_val_acc': avg_val_acc} #, 'progress_bar': pbar}
 
     def test_step(self, batch, batch_idx):
-        print(self.validation_step(batch, batch_idx))
+        x, y = batch
+
+        b = x.size()
+        x = x.view(b, -1)
+
+        preds = self(x)
+
+        J = self.loss(preds, y)
+
+        torch.sigmoid_(preds)
+
+        self.predictions = np.concatenate((self.predictions, preds.detach().cpu().numpy()), 0)
+
+        results = self.validation_step(batch, batch_idx)
+        results['test_acc'] = results['val_acc']
+        del results['val_acc']
+
+        return results
+
+    def test_epoch_end(self, test_step_outputs):
+        avg_test_loss = torch.tensor([x['loss'] for x in test_step_outputs]).mean()
+        avg_test_acc = torch.tensor([x['test_acc'] for x in test_step_outputs]).mean()
+
+        avg_metrics = {'avg_test_loss': avg_test_loss, 'avg_test_acc': avg_test_acc}
+
+        self.log_dict(avg_metrics, on_epoch=True, prog_bar=True, logger=True)
+
+        return avg_metrics
+
+    def clean_predictions(self):
+        self.predictions = np.empty((0, self.n_classes), dtype=np.float32)
