@@ -7,7 +7,7 @@ import torch
 import os
 
 from data.modules import RetinaDataModule
-from models import RetinaClassifier
+from models.models import RetinaClassifier
 from utils.metrics import auc_score, mAP_score
 
 
@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
     model = get_model(args.model_path, args.model_name, args.num_classes)
     
-    trainer = pl.Trainer(gpus=1, deterministic=True, limit_test_batches=1.0)
+    trainer = pl.Trainer(gpus=1, deterministic=True, limit_test_batches=1.0, precision=16)
 
     y_true = data.iloc[:, args.start_col:].to_numpy(dtype=np.float32)
     y_pred = np.empty((0))

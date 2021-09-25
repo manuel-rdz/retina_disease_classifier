@@ -2,10 +2,22 @@
 data_dir: C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Evaluation_Set\RFMiD_Validation_Labels.csv
 test_imgs:
 - C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Evaluation_Set\Evaluation
-model_path:  C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\20210910-205105-vit_base_patch16_224-224\model_best.pth.tar
-output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\20210910-205105-vit_base_patch16_224-224
-model_name: vit_base_patch16_224
-batch_size: 16
+model_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\20210914-142245-vit_large_patch16_224-224\model_best.pth.tar
+#C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\20210914-000244-vit_base_patch16_384-384\model_best.pth.tar
+#C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\b5-ns-960\tf_efficientnet_b5_ns-960-fold4-model_best.pth.tar
+#C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\b6-ns-768\tf_efficientnet_b6_ns-768-fold4-model_best.pth.tar
+#C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\20210910-205105-vit_base_patch16_224-224\model_best.pth.tar
+output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\20210914-142245-vit_large_patch16_224-224
+#C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\20210914-000244-vit_base_patch16_384-384
+#C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\b5-ns-960
+#C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\b6-ns-768
+#C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\20210910-205105-vit_base_patch16_224-224
+model_name: vit_large_patch16_224
+#vit_base_patch16_384
+#tf_efficientnet_b5_ns
+#tf_efficientnet_b6_ns
+#vit_base_patch16_224
+batch_size: 10
 num_classes: 29
 img_size: 224
 start_col: 1

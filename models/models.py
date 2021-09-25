@@ -1,4 +1,5 @@
 from optimizers.AsymetricLoss import AsymmetricLossOptimized
+from models.utils import create_model
 
 import pytorch_lightning as pl
 import torch.optim as optim
@@ -13,24 +14,7 @@ class RetinaClassifier(pl.LightningModule):
     def __init__(self, model_name='vit', n_classes=29, requires_grad=False):
         super().__init__()
 
-        self.model = timm.create_model(model_name, pretrained = True)
-        
-        #model = models.resnet50(progress=True, pretrained=pretrained)
-        # to freeze the hidden layers
-        if requires_grad == False:
-            for param in self.model.parameters():
-                param.requires_grad = False
-        # to train the hidden layers
-        elif requires_grad == True:
-            for param in self.model.parameters():
-                param.requires_grad = True
-        # make the classification layer learnable
-        
-        # Add last layer that contains the amount of classes to predict
-        self.model.head = nn.Linear(self.model.head.in_features, n_classes)
-        # we have 25 classes in total
-        #model.fc = nn.Linear(2048, n_classes)
-        #self.base_model = model
+        self.model = create_model(model_name, n_classes, True, requires_grad)
 
         self.loss = AsymmetricLossOptimized(gamma_neg=2, gamma_pos=1)
         self.n_classes = n_classes
