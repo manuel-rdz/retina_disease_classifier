@@ -139,3 +139,4 @@ cython_debug/
 
 # pytorch lightning
 lightning_logs/
+experiments.py

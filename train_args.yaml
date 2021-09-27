@@ -5,13 +5,20 @@ train_imgs:
 val_imgs:
 - C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
 test_imgs:
-batch_size: 16
+output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\RIADD\
+batch_size: 30
+lr: 0.00012
 num_classes: 29
-model: vit_base_patch16_224
-img_size: 224
+model: efficientnet_b0
+#vit_base_patch16_224
+img_size: 960
 start_col: 1
 experiment: 
 seed: 42
-num_workers: 2
+num_workers: 1
 pin_memory: True
-epochs: 3
+epochs: 50
+auto_batch_size: False
+auto_lr: False
+limit_train_batches: 5
+limit_val_batches: 5

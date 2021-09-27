@@ -114,25 +114,33 @@ if __name__ == '__main__':
     task2_score = (auc + mAP) / 2
 
     final_score = (auc_bin + task2_score) / 2
-    print('----- Multilabel scores -----')
-    print('auc_score: ', auc)
-    print('mAP: ', mAP)
-    print('task score: ', task2_score)
-    print('----- Binary scores -----')
-    print('auc: ', auc_bin)
-    print('mAP: ', map_bin)
-    print('----- Final Score -----')
-    print(final_score)
+
+    msg = '----- Multilabel scores -----\n'
+    msg += 'auc_score: {}\n'.format(auc)
+    msg += 'mAP: {}\n'.format(mAP)
+    msg += 'task score: {}\n'.format(task2_score)
+    msg += '----- Binary scores -----\n'
+    msg += 'auc: {}\n'.format(auc_bin)
+    msg += 'mAP: {}\n'.format(map_bin)
+    msg += '----- Final Score -----\n'
+    msg += str(final_score)
 
     scores_auc.insert(0, auc_bin)
     scores_mAP.insert(0, map_bin)
 
-    np.savetxt(os.path.join(args.output_path, 'auc_scores.csv'), 
-        scores_auc,
+    np.savetxt(os.path.join(os.getcwd(), 'preds.csv'), 
+        y_pred,
         delimiter =", ", 
         fmt ='% s')
 
-    np.savetxt(os.path.join(args.output_path, 'map_scores.csv'), 
-        scores_mAP,
-        delimiter =", ", 
-        fmt ='% s')
+    np.savetxt(os.path.join(os.getcwd(), 'scores.csv'),
+        np.column_stack((np.array(scores_auc), np.array(scores_mAP))),
+        header='auc, map',
+        delimiter=', ',
+        fmt='% s')
+
+    f = open("final_scores.txt", "w")
+    f.write(msg)
+    f.close()
+
+    print(msg)

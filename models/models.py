@@ -11,11 +11,12 @@ import numpy as np
 
 
 class RetinaClassifier(pl.LightningModule):
-    def __init__(self, model_name='vit', n_classes=29, requires_grad=False):
+    def __init__(self, model_name='vit', n_classes=29, requires_grad=False, lr=0.001):
         super().__init__()
 
         self.model = create_model(model_name, n_classes, True, requires_grad)
 
+        self.lr = lr
         self.loss = AsymmetricLossOptimized(gamma_neg=2, gamma_pos=1)
         self.n_classes = n_classes
 
@@ -25,8 +26,11 @@ class RetinaClassifier(pl.LightningModule):
         return self.model(x)
 
     def configure_optimizers(self):
-        optimizer = optim.Adam(self.model.parameters(), lr=0.001)
-        return optimizer
+        optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+        lr_scheduler = {
+            'scheduler': optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1, verbose=True),
+            'monitor': 'avg_val_loss'}
+        return [optimizer], [lr_scheduler]
 
     def training_step(self, batch, batch_idx):
         x, y = batch
@@ -38,7 +42,7 @@ class RetinaClassifier(pl.LightningModule):
 
         J = self.loss(logits, y)
 
-        torch.sigmoid_(logits)
+        #torch.sigmoid_(logits)
         #auc_score = tm.functional.auroc(logits, y, num_classes=self.n_classes)
 
         #auc_score = 0
@@ -48,41 +52,41 @@ class RetinaClassifier(pl.LightningModule):
         #auc_score /= logits.size()[1]
         #acc = tm.functional.auc(torch.sigmoid(logits), y)
 
-        acc = tm.functional.accuracy(logits, y)
+        #acc = tm.functional.accuracy(logits, y)
 
         #self.log("train_loss", J, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        self.log('acc', acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)  
+        #self.log('acc', acc, on_step=True, on_epoch=True, prog_bar=True, #logger=True)  
 
 
         #pbar = {'train_acc': acc}
         
         return {
-            'loss': J,
-            'train_acc': acc}
+            'loss': J}
+        #    'train_acc': acc}
         #    'progress_bar': pbar}
     
     def validation_step(self, batch, batch_idx):
         results = self.training_step(batch, batch_idx)
-        results['val_acc'] = results['train_acc']
-        del results['train_acc']
+        #results['val_acc'] = results['train_acc']
+        #del results['train_acc']
         #results['progress_bar']['val_acc'] = results['progress_bar']['train_acc']
         #del results['progress_bar']['train_acc']
         return results
 
     def validation_epoch_end(self, val_step_outputs):
         avg_val_loss = torch.tensor([x['loss'] for x in val_step_outputs]).mean()
-        avg_val_acc = torch.tensor([x['val_acc'] for x in val_step_outputs]).mean()
+        #avg_val_acc = torch.tensor([x['val_acc'] for x in val_step_outputs]).mean()
 
         #print('val auc score')
         #print(avg_val_acc)
 
         self.log("avg_val_loss", avg_val_loss, on_epoch=True, prog_bar=True, logger=True)
-        self.log('avg_val_acc', avg_val_acc, on_epoch=True, prog_bar=True, logger=True)  
+        #self.log('avg_val_acc', avg_val_acc, on_epoch=True, prog_bar=True, logger=True)  
 
         #pbar = {'avg_val_acc': avg_val_acc}
 
-        return {'avg_val_loss': avg_val_loss,
-                'avg_val_acc': avg_val_acc} #, 'progress_bar': pbar}
+        return {'avg_val_loss': avg_val_loss}
+                #'avg_val_acc': avg_val_acc} #, 'progress_bar': pbar}
 
     def test_step(self, batch, batch_idx):
         x, y = batch
