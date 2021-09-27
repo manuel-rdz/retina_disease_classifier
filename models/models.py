@@ -28,7 +28,7 @@ class RetinaClassifier(pl.LightningModule):
     def configure_optimizers(self):
         optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
         lr_scheduler = {
-            'scheduler': optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=1, verbose=True),
+            'scheduler': optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=4, verbose=True),
             'monitor': 'avg_val_loss'}
         return [optimizer], [lr_scheduler]
 
@@ -103,16 +103,17 @@ class RetinaClassifier(pl.LightningModule):
         self.predictions = np.concatenate((self.predictions, preds.detach().cpu().numpy()), 0)
 
         results = self.validation_step(batch, batch_idx)
-        results['test_acc'] = results['val_acc']
-        del results['val_acc']
+        #results['test_acc'] = results['val_acc']
+        #del results['val_acc']
 
         return results
 
     def test_epoch_end(self, test_step_outputs):
         avg_test_loss = torch.tensor([x['loss'] for x in test_step_outputs]).mean()
-        avg_test_acc = torch.tensor([x['test_acc'] for x in test_step_outputs]).mean()
+        #avg_test_acc = torch.tensor([x['test_acc'] for x in test_step_outputs]).mean()
 
-        avg_metrics = {'avg_test_loss': avg_test_loss, 'avg_test_acc': avg_test_acc}
+        avg_metrics = {'avg_test_loss': avg_test_loss}
+        #, 'avg_test_acc': avg_test_acc}
 
         self.log_dict(avg_metrics, on_epoch=True, prog_bar=True, logger=True)
 

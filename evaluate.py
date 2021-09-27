@@ -49,7 +49,7 @@ def _parse_args():
 
 def get_model(model_path, model_name, n_classes):
     if '.ckpt' in model_path:
-        return RetinaClassifier.load_from_checkpoint(model_path, model_name=model_name, num_classes=n_classes)
+        return RetinaClassifier.load_from_checkpoint(model_path, model_name=model_name, n_classes=n_classes)
     elif '.pth.tar' in model_path:
         retina_model = RetinaClassifier(model_name=model_name, n_classes=n_classes)
 
@@ -128,18 +128,18 @@ if __name__ == '__main__':
     scores_auc.insert(0, auc_bin)
     scores_mAP.insert(0, map_bin)
 
-    np.savetxt(os.path.join(os.getcwd(), 'preds.csv'), 
+    np.savetxt(os.path.join(args.output_path, 'preds.csv'), 
         y_pred,
         delimiter =", ", 
         fmt ='% s')
 
-    np.savetxt(os.path.join(os.getcwd(), 'scores.csv'),
+    np.savetxt(os.path.join(args.output_path, 'scores.csv'),
         np.column_stack((np.array(scores_auc), np.array(scores_mAP))),
         header='auc, map',
         delimiter=', ',
         fmt='% s')
 
-    f = open("final_scores.txt", "w")
+    f = open(os.path.join(args.output_path, "final_scores.txt"), "w")
     f.write(msg)
     f.close()
 

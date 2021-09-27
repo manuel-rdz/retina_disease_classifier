@@ -1,4 +1,3 @@
-from pytorch_lightning import callbacks
 from models.models import RetinaClassifier
 from iterstrat.ml_stratifiers import MultilabelStratifiedKFold
 from data.modules import RetinaDataModule
@@ -90,10 +89,9 @@ if __name__ == '__main__':
 
     early_stopping = EarlyStopping(
         monitor='avg_val_loss', 
-        patience=8, 
+        patience=15, 
         verbose=True, 
         mode='min')
-
 
     model = RetinaClassifier(
         model_name=args.model, 

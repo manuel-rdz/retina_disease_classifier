@@ -10,7 +10,7 @@ def get_riadd_train_transforms(image_size):
         albumentations.HorizontalFlip(p=0.5),
         albumentations.VerticalFlip(p=0.5),
         albumentations.MedianBlur(blur_limit = 7, p=0.3),
-        albumentations.IAAAdditiveGaussianNoise(scale = (0,0.15*255), p = 0.5),
+        albumentations.GaussNoise(var_limit=(0,0.15*255), p = 0.5),
         albumentations.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=10, val_shift_limit=10, p=0.3),
         albumentations.RandomBrightnessContrast(brightness_limit=(-0.2,0.2), contrast_limit=(-0.2, 0.2), p=0.3),
         albumentations.Cutout(max_h_size=20, max_w_size=20, num_holes=5, p=0.5),
