@@ -1,26 +1,28 @@
----
-data_dir: /home/kunet.ae/100058256/datasets/RIADD_cropped/Training_Set/RFMiD_Training_Labels.csv
-train_imgs:
-- /home/kunet.ae/100058256/datasets/RIADD_cropped/Training_Set/Training
-val_imgs:
-- /home/kunet.ae/100058256/datasets/RIADD_cropped/Training_Set/Training
-test_imgs:
-output_path: /home/kunet.ae/100058256/codes/trained_models/RIADD/
-batch_size: 8
-lr: 0.0003630780
-num_classes: 29
-model: vit_large_patch16_384
-#efficientnet_b0
-#vit_base_patch16_224
-img_size: 384
-start_col: 1
-experiment:
-seed: 42
-num_workers: 4
-pin_memory: True
-epochs: 50
-auto_batch_size: False
-auto_lr: False
-limit_train_batches: 1.0
-limit_val_batches: 1.0
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=10
+#SBATCH --job-name=evaluation
+#SBATCH --time=00:30:00
+#SBATCH --partition=gpu
+#SBATCH --account=kuex0005
+#SBATCH --output=evaluation.%j.out
+#SBATCH --error=evaluation.%j.err
+#SBATCH --exclusive
 
+module purge
+module load gcc/9.3
+module load python/3.9.6
+module load miniconda/3
+module load cuda/11.3
+
+pip install pillow
+pip install numpy
+pip install torch==1.8.0+cu111 torchvision==0.9.0+cu111 torchaudio==0.8.0 -f https://download.pytorch.org/whl/torch_stable.html
+pip install -U scikit-learn
+pip install visdom
+pip install pandas
+pip install tensorboard
+pip install -U albumentations
+pip install pytorch-lightning
+
+python train.py -c riadd_train_args.yaml
