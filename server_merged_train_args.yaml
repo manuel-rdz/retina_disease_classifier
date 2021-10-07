@@ -1,0 +1,27 @@
+---
+data_dir: /home/kunet.ae/100058256/datasets/clean_merged_dataset_only_2.csv
+train_imgs:
+- /home/kunet.ae/100058256/datasets/ARIA/all_images
+- /home/kunet.ae/100058256/datasets/STARE/all-images
+val_imgs:
+- /home/kunet.ae/100058256/datasets/ARIA/all_images
+- /home/kunet.ae/100058256/datasets/STARE/all-images
+test_imgs:
+output_path: /home/kunet.ae/100058256/codes/trained_models/merged/
+batch_size: 16
+lr: 0.00012
+num_classes: 15
+model: vit_base_patch16_224 
+#vit_base_patch16_384 
+#efficientnet_b0
+img_size: 224
+start_col: 3
+experiment: 
+seed: 42
+num_workers: 1
+pin_memory: True
+epochs: 1
+auto_batch_size: False
+auto_lr: False
+limit_train_batches: 0.2
+limit_val_batches: 0.2
