@@ -5,6 +5,7 @@ from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor, EarlyStopping
 
 import pandas as pd
+import numpy as np
 import argparse
 import yaml
 import os
@@ -74,14 +75,6 @@ if __name__ == '__main__':
     args_file.write(args_text)
     args_file.close()
 
-    checkpoint = ModelCheckpoint(
-        monitor="avg_val_loss",
-        dirpath=output_dir,
-        filename=args.model + '-{epoch:02d}-{avg_val_loss:.3f}',
-        save_top_k=2,
-        mode="min",
-    )
-
     lr_monitor = LearningRateMonitor(
         logging_interval='step',
         log_momentum=True,
@@ -93,24 +86,36 @@ if __name__ == '__main__':
         verbose=True, 
         mode='min')
 
-    model = RetinaClassifier(
-        model_name=args.model, 
-        n_classes=args.num_classes,
-        lr=args.lr)
-        
-    trainer = Trainer(
-        gpus=-1,
-        auto_select_gpus=True,
-        auto_scale_batch_size=args.auto_batch_size,
-        auto_lr_find=args.auto_lr, 
-        deterministic=True,
-        precision=16, 
-        max_epochs=args.epochs,
-        callbacks=[checkpoint, lr_monitor, early_stopping], 
-        limit_train_batches=args.limit_train_batches, 
-        limit_val_batches=args.limit_val_batches)
-
     for fold_i, (train_idx, val_idx) in enumerate(folds.split(data, data.iloc[:, args.start_col:])):
+        fold_path = os.path.join(output_dir, 'fold_' + fold_i)
+        os.mkdir(fold_path)
+
+        checkpoint = ModelCheckpoint(
+            monitor="avg_val_loss",
+            dirpath=fold_path,
+            filename=args.model + '-{epoch:02d}-{avg_val_loss:.3f}',
+            save_top_k=1,
+            mode="min",
+        )
+
+        model = RetinaClassifier(
+            model_name=args.model, 
+            n_classes=args.num_classes,
+            lr=args.lr)
+
+        trainer = Trainer(
+            gpus=-1,
+            auto_select_gpus=True,
+            auto_scale_batch_size=args.auto_batch_size,
+            auto_lr_find=args.auto_lr, 
+            deterministic=True,
+            precision=16, 
+            max_epochs=args.epochs,
+            callbacks=[checkpoint, lr_monitor, early_stopping], 
+            limit_train_batches=args.limit_train_batches, 
+            limit_val_batches=args.limit_val_batches)
+
+
         data_module = RetinaDataModule(
             df_train=data.iloc[train_idx, :],
             df_val=data.iloc[val_idx, :],
@@ -122,15 +127,22 @@ if __name__ == '__main__':
             pin_memory=args.pin_memory,
         )
 
-        trainer.tune(model, datamodule=data_module)
+        #trainer.tune(model, datamodule=data_module)
 
         print('Using batch size: ', data_module.batch_size)
         print('Using learning rate: ', model.lr)
 
         trainer.fit(model, data_module)
 
-        break
+        np.savetxt(os.path.join(fold_path, 'val_idx.csv'),
+            val_idx,
+            delimiter=', ',
+            fmt='% s')
 
+        np.savetxt(os.path.join(fold_path, 'train_idx.csv'),
+            train_idx,
+            delimiter=', ',
+            fmt='% s')
 
 # for checkpoints
 # ! ls lightning_logs

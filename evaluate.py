@@ -31,6 +31,7 @@ parser.add_argument('--tta', default=1, help='number of times to apply tta')
 parser.add_argument('--model_name', help='model to load')
 parser.add_argument('--output_path', help='path to output the generated csv')
 
+
 def _parse_args():
     # Do we have a config file to parse?
     args_config, remaining = config_parser.parse_known_args()
@@ -47,6 +48,7 @@ def _parse_args():
     args_text = yaml.safe_dump(args.__dict__, default_flow_style=False)
     return args, args_text
 
+
 def get_model(model_path, model_name, n_classes):
     if '.ckpt' in model_path:
         return RetinaClassifier.load_from_checkpoint(model_path, model_name=model_name, n_classes=n_classes)
@@ -61,41 +63,20 @@ def get_model(model_path, model_name, n_classes):
         print('unknown extension ', model_path)
         return None
 
-
-if __name__ == '__main__':
-    args, args_text = _parse_args()
-
-    pl.seed_everything(args.seed)
-
-    data = pd.read_csv(args.data_dir)
-
-    data_module = RetinaDataModule(
-        df_test=data,
-        test_img_path=args.test_imgs,
-        img_size=args.img_size,
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
-        pin_memory=args.pin_memory,
-        stage='test',
-    )
-
-    model = get_model(args.model_path, args.model_name, args.num_classes)
     
+def get_predictions(model, data_module, tta):
     trainer = pl.Trainer(gpus=1, deterministic=True, limit_test_batches=1.0, precision=16)
 
-    y_true = data.iloc[:, args.start_col:].to_numpy(dtype=np.float32)
-    y_pred = np.empty((0))
-
-    for i in range(args.tta):
+    for i in range(tta):
         trainer.test(model, data_module)
         
-        auc_avg_score, auc_scores = auc_score(y_true, model.predictions)
-        map_avg_score, map_scores = mAP_score(y_true, model.predictions)
+        #auc_avg_score, auc_scores = auc_score(y_true, model.predictions)
+        #map_avg_score, map_scores = mAP_score(y_true, model.predictions)
 
-        print('AUC_scores:')
-        print(auc_avg_score, auc_scores)
-        print('mAP scores:')
-        print(map_avg_score, map_scores)
+        #print('AUC_scores:')
+        #print(auc_avg_score, auc_scores)
+        #print('mAP scores:')
+        #print(map_avg_score, map_scores)
 
         if len(y_pred) == 0:
             y_pred = model.predictions
@@ -104,8 +85,12 @@ if __name__ == '__main__':
 
         model.clean_predictions()
 
-    y_pred /= args.tta
-    
+    y_pred /= tta
+
+    return y_pred
+
+
+def get_scores(y_true, y_pred):
     auc_bin, scores_auc = auc_score(y_true[:, 0], y_pred[:, 0])
     map_bin, scores_map = mAP_score(y_true[:, 0], y_pred[:, 0])
     
@@ -128,13 +113,45 @@ if __name__ == '__main__':
     scores_auc.insert(0, auc_bin)
     scores_mAP.insert(0, map_bin)
 
+
+if __name__ == '__main__':
+    args, args_text = _parse_args()
+
+    pl.seed_everything(args.seed)
+
+    data = pd.read_csv(args.data_dir)
+
+    data_module = RetinaDataModule(
+        df_test=data,
+        test_img_path=args.test_imgs,
+        img_size=args.img_size,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        pin_memory=args.pin_memory,
+        stage='test',
+    )
+
+    model = get_model(args.model_path, args.model_name, args.num_classes)
+
+    y_true = data.iloc[:, args.start_col:].to_numpy(dtype=np.float32)
+    y_pred = np.zeros(y_true.shape)
+
+    for fold in args.folds:
+        val_idx = pd.read_csv(os.path.join(args.model_path, 'val_idx.csv')).to_numpy(dtype=np.int32)
+        fold_pred = get_predictions(model, data_module, args.tta)
+
+        y_pred[val_idx, :] = fold_pred[val_idx, :]
+
+    
+    msg, scores_auc, scores_map = get_scores(y_true, y_pred)
+
     np.savetxt(os.path.join(args.output_path, 'preds.csv'), 
         y_pred,
         delimiter =", ", 
         fmt ='% s')
 
     np.savetxt(os.path.join(args.output_path, 'scores.csv'),
-        np.column_stack((np.array(scores_auc), np.array(scores_mAP))),
+        np.column_stack((np.array(scores_auc), np.array(scores_map))),
         header='auc, map',
         delimiter=', ',
         fmt='% s')

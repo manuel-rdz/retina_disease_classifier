@@ -66,15 +66,37 @@ class RetinaClassifier(pl.LightningModule):
         #    'progress_bar': pbar}
     
     def validation_step(self, batch, batch_idx):
-        results = self.training_step(batch, batch_idx)
+        x, y = batch
+
+        b = x.size()
+        x = x.view(b, -1)
+
+        preds = self(x)
+
+        J = self.loss(preds, y)
+
+        torch.sigmoid_(preds)
+
+        self.predictions = np.concatenate((self.predictions, preds.detach().cpu().numpy()), 0)
+
+        #results = self.validation_step(batch, batch_idx)
+        #results['test_acc'] = results['val_acc']
+        #del results['val_acc']
+
+        return {
+            'val_loss', J,
+        }
+        
+        
+        #results = self.training_step(batch, batch_idx)
         #results['val_acc'] = results['train_acc']
         #del results['train_acc']
         #results['progress_bar']['val_acc'] = results['progress_bar']['train_acc']
         #del results['progress_bar']['train_acc']
-        return results
+        #return results
 
     def validation_epoch_end(self, val_step_outputs):
-        avg_val_loss = torch.tensor([x['loss'] for x in val_step_outputs]).mean()
+        avg_val_loss = torch.tensor([x['val_loss'] for x in val_step_outputs]).mean()
         #avg_val_acc = torch.tensor([x['val_acc'] for x in val_step_outputs]).mean()
 
         #print('val auc score')
