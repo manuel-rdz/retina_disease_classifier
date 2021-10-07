@@ -3,14 +3,15 @@ data_dir: C:\Users\AI\Desktop\student_Manuel\datasets\clean_merged_dataset_only_
 test_imgs:
 - C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images
 - C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all-images
-model_path:  C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged\20210927-174606-vit_base_patch16_384\vit_base_patch16_384-epoch=54-avg_val_loss=16.157.ckpt
-output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged\20210927-174606-vit_base_patch16_384
-model_name: vit_base_patch16_384
+model_path:  C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged\20211007-082531-vit_base_patch16_224
+output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged\20211007-082531-vit_base_patch16_224
+model_name: vit_base_patch16_224
 batch_size: 16
 num_classes: 15
-img_size: 384
+img_size: 224
 start_col: 3
 seed: 42
 num_workers: 4
 pin_memory: True
-tta: 3
+tta: 1
+folds: 2

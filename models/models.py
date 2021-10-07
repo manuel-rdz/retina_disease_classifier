@@ -84,7 +84,7 @@ class RetinaClassifier(pl.LightningModule):
         #del results['val_acc']
 
         return {
-            'val_loss', J,
+            'val_loss': J,
         }
         
         
@@ -131,15 +131,16 @@ class RetinaClassifier(pl.LightningModule):
         return results
 
     def test_epoch_end(self, test_step_outputs):
-        avg_test_loss = torch.tensor([x['loss'] for x in test_step_outputs]).mean()
+        pass
+        #avg_test_loss = torch.tensor([x['loss'] for x in test_step_outputs]).mean()
         #avg_test_acc = torch.tensor([x['test_acc'] for x in test_step_outputs]).mean()
 
-        avg_metrics = {'avg_test_loss': avg_test_loss}
+        #avg_metrics = {'avg_test_loss': avg_test_loss}
         #, 'avg_test_acc': avg_test_acc}
 
-        self.log_dict(avg_metrics, on_epoch=True, prog_bar=True, logger=True)
+        #self.log_dict(avg_metrics, on_epoch=True, prog_bar=True, logger=True)
 
-        return avg_metrics
+        #return avg_metrics
 
     def clean_predictions(self):
         self.predictions = np.empty((0, self.n_classes), dtype=np.float32)

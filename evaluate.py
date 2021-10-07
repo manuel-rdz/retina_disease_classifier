@@ -5,6 +5,7 @@ import yaml
 import numpy as np
 import torch
 import os
+import glob
 
 from data.modules import RetinaDataModule
 from models.models import RetinaClassifier
@@ -30,6 +31,7 @@ parser.add_argument('--pin_memory', default=False, help='pin memory for dataload
 parser.add_argument('--tta', default=1, help='number of times to apply tta')
 parser.add_argument('--model_name', help='model to load')
 parser.add_argument('--output_path', help='path to output the generated csv')
+parser.add_argument('--folds', help='number of folds to use for cross validation')
 
 
 def _parse_args():
@@ -66,6 +68,8 @@ def get_model(model_path, model_name, n_classes):
     
 def get_predictions(model, data_module, tta):
     trainer = pl.Trainer(gpus=1, deterministic=True, limit_test_batches=1.0, precision=16)
+
+    y_pred = np.zeros(0)
 
     for i in range(tta):
         trainer.test(model, data_module)
@@ -113,6 +117,8 @@ def get_scores(y_true, y_pred):
     scores_auc.insert(0, auc_bin)
     scores_mAP.insert(0, map_bin)
 
+    return msg, scores_auc, scores_mAP
+
 
 if __name__ == '__main__':
     args, args_text = _parse_args()
@@ -131,17 +137,21 @@ if __name__ == '__main__':
         stage='test',
     )
 
-    model = get_model(args.model_path, args.model_name, args.num_classes)
-
     y_true = data.iloc[:, args.start_col:].to_numpy(dtype=np.float32)
     y_pred = np.zeros(y_true.shape)
 
-    for fold in args.folds:
-        val_idx = pd.read_csv(os.path.join(args.model_path, 'val_idx.csv')).to_numpy(dtype=np.int32)
-        fold_pred = get_predictions(model, data_module, args.tta)
+    if args.folds > 0:
+        for fold in range(args.folds):
+            model_path = glob.glob(os.path.join(args.model_path, 'fold_' + str(fold), '*.ckpt'))
+            print(model_path)
+            model = get_model(model_path[0], args.model_name, args.num_classes)
+            val_idx = pd.read_csv(os.path.join(args.model_path, 'fold_' + str(fold) ,'val_idx.csv')).to_numpy(dtype=np.int32)
+            fold_pred = get_predictions(model, data_module, args.tta)
 
-        y_pred[val_idx, :] = fold_pred[val_idx, :]
-
+            y_pred[val_idx, :] = fold_pred[val_idx, :]
+    else:
+        model = get_model(args.model_path, args.model_name, args.num_classes)
+        y_pred = get_predictions(model, data_module, args.tta)
     
     msg, scores_auc, scores_map = get_scores(y_true, y_pred)
 

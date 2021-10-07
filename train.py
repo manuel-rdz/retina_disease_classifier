@@ -87,7 +87,7 @@ if __name__ == '__main__':
         mode='min')
 
     for fold_i, (train_idx, val_idx) in enumerate(folds.split(data, data.iloc[:, args.start_col:])):
-        fold_path = os.path.join(output_dir, 'fold_' + fold_i)
+        fold_path = os.path.join(output_dir, 'fold_' + str(fold_i))
         os.mkdir(fold_path)
 
         checkpoint = ModelCheckpoint(
