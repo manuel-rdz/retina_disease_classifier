@@ -128,7 +128,10 @@ if __name__ == '__main__':
             start_col_labels=args.start_col,
         )
 
-        #trainer.tune(model, datamodule=data_module)
+        if args.auto_lr:
+            trainer.tune(model, datamodule=data_module)
+            args.lr = model.lr
+            args.auto_lr = False
 
         print('Using batch size: ', data_module.batch_size)
         print('Using learning rate: ', model.lr)

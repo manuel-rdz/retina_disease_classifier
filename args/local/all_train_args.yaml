@@ -24,6 +24,6 @@ num_workers: 1
 pin_memory: True
 epochs: 1
 auto_batch_size: False
-auto_lr: False
-limit_train_batches: 3
-limit_val_batches: 3
+auto_lr: True
+limit_train_batches: 1.0
+limit_val_batches: 1.0
