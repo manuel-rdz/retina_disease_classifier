@@ -125,6 +125,7 @@ if __name__ == '__main__':
             batch_size=args.batch_size,
             num_workers=args.num_workers,
             pin_memory=args.pin_memory,
+            start_col_labels=args.start_col,
         )
 
         #trainer.tune(model, datamodule=data_module)

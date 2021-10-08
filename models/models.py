@@ -124,11 +124,11 @@ class RetinaClassifier(pl.LightningModule):
 
         self.predictions = np.concatenate((self.predictions, preds.detach().cpu().numpy()), 0)
 
-        results = self.validation_step(batch, batch_idx)
+        #results = self.validation_step(batch, batch_idx)
         #results['test_acc'] = results['val_acc']
         #del results['val_acc']
 
-        return results
+        #return results
 
     def test_epoch_end(self, test_step_outputs):
         pass

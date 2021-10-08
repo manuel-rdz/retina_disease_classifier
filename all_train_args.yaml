@@ -1,0 +1,29 @@
+---
+data_dir: C:\Users\AI\Desktop\student_Manuel\datasets\clean_merged_dataset_all.csv
+train_imgs:
+- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images
+- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all-images
+- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
+val_imgs:
+- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images
+- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all-images
+- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
+test_imgs:
+output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all\
+batch_size: 16
+lr: 0.00012
+num_classes: 34
+model: vit_base_patch16_224 
+#vit_base_patch16_384 
+#efficientnet_b0
+img_size: 224
+start_col: 4
+experiment: 
+seed: 42
+num_workers: 1
+pin_memory: True
+epochs: 1
+auto_batch_size: False
+auto_lr: False
+limit_train_batches: 3
+limit_val_batches: 3
