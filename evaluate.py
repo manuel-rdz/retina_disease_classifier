@@ -9,7 +9,7 @@ import glob
 
 from data.modules import RetinaDataModule
 from models.models import RetinaClassifier
-from utils.metrics import auc_score, mAP_score
+from utils.metrics import get_metrics_message, get_scores 
 
 
 config_parser = parser = argparse.ArgumentParser(description='Training Config', add_help=False)
@@ -93,36 +93,6 @@ def get_predictions(model, data_module, tta):
 
     return y_pred
 
-def get_metrics_message(bin_auc, bin_map, labels_auc, labels_map):
-    task2_score = (labels_auc + labels_map) / 2
-
-    final_score = (bin_auc + task2_score) / 2
-
-    msg = '----- Multilabel scores -----\n'
-    msg += 'auc_score: {}\n'.format(labels_auc)
-    msg += 'mAP: {}\n'.format(labels_map)
-    msg += 'task score: {}\n'.format(task2_score)
-    msg += '----- Binary scores -----\n'
-    msg += 'auc: {}\n'.format(bin_auc)
-    msg += 'mAP: {}\n'.format(bin_map)
-    msg += '----- Final Score -----\n'
-    msg += str(final_score)
-
-    return msg
-
-
-def get_scores(y_true, y_pred):
-    bin_auc, scores_auc = auc_score(y_true[:, 0], y_pred[:, 0])
-    bin_map, scores_map = mAP_score(y_true[:, 0], y_pred[:, 0])
-    
-    labels_auc, scores_auc = auc_score(y_true[:, 1:], y_pred[:, 1:])
-    labels_map, scores_map = mAP_score(y_true[:, 1:], y_pred[:, 1:])
-
-    scores_auc.insert(0, bin_auc)
-    scores_map.insert(0, bin_map)
-
-    return np.array([bin_auc, bin_map, labels_auc, labels_map]), scores_auc, scores_map  
-
 
 if __name__ == '__main__':
     args, args_text = _parse_args()
@@ -194,7 +164,7 @@ if __name__ == '__main__':
         fmt ='% s')
 
     np.savetxt(os.path.join(args.output_path, 'scores.csv'),
-        np.column_stack((np.array(scores_auc), np.array(scores_map))),
+        np.column_stack((scores_auc, scores_map)),
         header='auc, map',
         delimiter=', ',
         fmt='% s')
