@@ -1,13 +1,12 @@
 #!/bin/bash
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=10
-#SBATCH --job-name=evaluation
-#SBATCH --time=00:30:00
+#SBATCH --job-name=train
+#SBATCH --time=02:00:00
 #SBATCH --partition=gpu
 #SBATCH --account=kuex0005
-#SBATCH --output=evaluation.%j.out
-#SBATCH --error=evaluation.%j.err
-#SBATCH --exclusive
+#SBATCH --output=train.%j.out
+#SBATCH --error=train.%j.err
 
 module purge
 module load gcc/9.3
@@ -25,4 +24,4 @@ pip install tensorboard
 pip install -U albumentations
 pip install pytorch-lightning
 
-python train.py -c riadd_train_args.yaml
+python train.py -c args/server/riadd_train_args.yaml

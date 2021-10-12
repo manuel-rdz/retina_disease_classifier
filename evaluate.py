@@ -134,6 +134,7 @@ if __name__ == '__main__':
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         pin_memory=args.pin_memory,
+        start_col_labels=args.start_col,
         stage='test',
     )
 
@@ -146,6 +147,9 @@ if __name__ == '__main__':
             print(model_path)
             model = get_model(model_path[0], args.model_name, args.num_classes)
             val_idx = pd.read_csv(os.path.join(args.model_path, 'fold_' + str(fold) ,'val_idx.csv')).to_numpy(dtype=np.int32)
+
+            #create data module containing only the val idx
+
             fold_pred = get_predictions(model, data_module, args.tta)
 
             y_pred[val_idx, :] = fold_pred[val_idx, :]

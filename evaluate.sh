@@ -1,5 +1,3 @@
-
-
 #!/bin/bash
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=10
@@ -7,8 +5,8 @@
 #SBATCH --time=00:30:00
 #SBATCH --partition=gpu
 #SBATCH --account=kuex0005
-#SBATCH --output=ensemble_evaluation.%j.out
-#SBATCH --error=ensemble_evaluation.%j.err
+#SBATCH --output=evaluation.%j.out
+#SBATCH --error=evaluation.%j.err
 
 module purge
 module load gcc/9.3
@@ -26,4 +24,4 @@ pip install tensorboard
 pip install -U albumentations
 pip install pytorch-lightning
 
-python evaluate.py -c riadd_evaluate_args.yaml
+python evaluate.py -c args/server/riadd_evaluate_args.yaml
