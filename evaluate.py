@@ -93,31 +93,35 @@ def get_predictions(model, data_module, tta):
 
     return y_pred
 
+def get_metrics_message(bin_auc, bin_map, labels_auc, labels_map):
+    task2_score = (labels_auc + labels_map) / 2
 
-def get_scores(y_true, y_pred):
-    auc_bin, scores_auc = auc_score(y_true[:, 0], y_pred[:, 0])
-    map_bin, scores_map = mAP_score(y_true[:, 0], y_pred[:, 0])
-    
-    auc, scores_auc = auc_score(y_true[:, 1:], y_pred[:, 1:])
-    mAP, scores_mAP = mAP_score(y_true[:, 1:], y_pred[:, 1:])
-    task2_score = (auc + mAP) / 2
-
-    final_score = (auc_bin + task2_score) / 2
+    final_score = (bin_auc + task2_score) / 2
 
     msg = '----- Multilabel scores -----\n'
-    msg += 'auc_score: {}\n'.format(auc)
-    msg += 'mAP: {}\n'.format(mAP)
+    msg += 'auc_score: {}\n'.format(labels_auc)
+    msg += 'mAP: {}\n'.format(labels_map)
     msg += 'task score: {}\n'.format(task2_score)
     msg += '----- Binary scores -----\n'
-    msg += 'auc: {}\n'.format(auc_bin)
-    msg += 'mAP: {}\n'.format(map_bin)
+    msg += 'auc: {}\n'.format(bin_auc)
+    msg += 'mAP: {}\n'.format(bin_map)
     msg += '----- Final Score -----\n'
     msg += str(final_score)
 
-    scores_auc.insert(0, auc_bin)
-    scores_mAP.insert(0, map_bin)
+    return msg
 
-    return msg, scores_auc, scores_mAP
+
+def get_scores(y_true, y_pred):
+    bin_auc, scores_auc = auc_score(y_true[:, 0], y_pred[:, 0])
+    bin_map, scores_map = mAP_score(y_true[:, 0], y_pred[:, 0])
+    
+    labels_auc, scores_auc = auc_score(y_true[:, 1:], y_pred[:, 1:])
+    labels_map, scores_map = mAP_score(y_true[:, 1:], y_pred[:, 1:])
+
+    scores_auc.insert(0, bin_auc)
+    scores_map.insert(0, bin_map)
+
+    return np.array([bin_auc, bin_map, labels_auc, labels_map]), scores_auc, scores_map  
 
 
 if __name__ == '__main__':
@@ -125,17 +129,22 @@ if __name__ == '__main__':
 
     pl.seed_everything(args.seed)
 
-    data = pd.read_csv(args.data_dir)
+    #bin_auc, bin_map, labels_auc, labels_map
+    avg_metrics = np.zeros(4)
+    scores_auc = scores_map = np.zeros(args.num_classes)
 
-    y_true = data.iloc[:, args.start_col:].to_numpy(dtype=np.float32)
-    y_pred = np.zeros(y_true.shape)
+    data = pd.read_csv(args.data_dir)
+    
+    y_pred = np.zeros((data.shape[0], data.shape[1] - args.start_col))
 
     if args.folds > 0:
         for fold in range(args.folds):
             model_path = glob.glob(os.path.join(args.model_path, 'fold_' + str(fold), '*.ckpt'))
             model = get_model(model_path[0], args.model_name, args.num_classes)
             
-            val_idx = pd.read_csv(os.path.join(args.model_path, 'fold_' + str(fold) ,'val_idx.csv')).to_numpy(dtype=np.int32)
+            val_idx = pd.read_csv(os.path.join(args.model_path, 'fold_' + str(fold) ,'val_idx.csv')).to_numpy(dtype=np.int32).squeeze()
+            
+            fold_y_true = data.iloc[val_idx, args.start_col:].to_numpy(dtype=np.float32)
 
             data_module = RetinaDataModule(
                 df_test=data.iloc[val_idx],
@@ -148,8 +157,19 @@ if __name__ == '__main__':
                 stage='test',
             )
 
-            fold_pred = get_predictions(model, data_module, args.tta)
-            y_pred[val_idx, :] = fold_pred
+            fold_y_pred = get_predictions(model, data_module, args.tta)
+            fold_avg_metrics, fold_scores_auc, fold_scores_map = get_scores(fold_y_true, fold_y_pred)
+
+            avg_metrics = np.add(avg_metrics, fold_avg_metrics)
+            scores_auc = np.add(scores_auc, fold_scores_auc)
+            scores_map = np.add(scores_map, fold_scores_map)
+
+            y_pred[val_idx] = fold_y_pred
+
+        avg_metrics /= args.folds
+        scores_auc /= args.folds
+        scores_map /= args.folds
+
     else:
         data_module = RetinaDataModule(
             df_test=data,
@@ -161,10 +181,12 @@ if __name__ == '__main__':
             start_col_labels=args.start_col,
             stage='test',
         )
+        y_true = data.iloc[:, args.start_col:].to_numpy(dtype=np.float32)
+
         model = get_model(args.model_path, args.model_name, args.num_classes)
         y_pred = get_predictions(model, data_module, args.tta)
     
-    msg, scores_auc, scores_map = get_scores(y_true, y_pred)
+        avg_metrics, scores_auc, scores_map = get_scores(y_true, y_pred)
 
     np.savetxt(os.path.join(args.output_path, 'preds.csv'), 
         y_pred,
@@ -177,8 +199,10 @@ if __name__ == '__main__':
         delimiter=', ',
         fmt='% s')
 
+    message = get_metrics_message(*avg_metrics)
+
     f = open(os.path.join(args.output_path, "final_scores.txt"), "w")
-    f.write(msg)
+    f.write(message)
     f.close()
 
-    print(msg)
+    print(message)
