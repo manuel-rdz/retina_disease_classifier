@@ -127,33 +127,40 @@ if __name__ == '__main__':
 
     data = pd.read_csv(args.data_dir)
 
-    data_module = RetinaDataModule(
-        df_test=data,
-        test_img_path=args.test_imgs,
-        img_size=args.img_size,
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
-        pin_memory=args.pin_memory,
-        start_col_labels=args.start_col,
-        stage='test',
-    )
-
     y_true = data.iloc[:, args.start_col:].to_numpy(dtype=np.float32)
     y_pred = np.zeros(y_true.shape)
 
     if args.folds > 0:
         for fold in range(args.folds):
             model_path = glob.glob(os.path.join(args.model_path, 'fold_' + str(fold), '*.ckpt'))
-            print(model_path)
             model = get_model(model_path[0], args.model_name, args.num_classes)
+            
             val_idx = pd.read_csv(os.path.join(args.model_path, 'fold_' + str(fold) ,'val_idx.csv')).to_numpy(dtype=np.int32)
 
-            #create data module containing only the val idx
+            data_module = RetinaDataModule(
+                df_test=data.iloc[val_idx],
+                test_img_path=args.test_imgs,
+                img_size=args.img_size,
+                batch_size=args.batch_size,
+                num_workers=args.num_workers,
+                pin_memory=args.pin_memory,
+                start_col_labels=args.start_col,
+                stage='test',
+            )
 
             fold_pred = get_predictions(model, data_module, args.tta)
-
-            y_pred[val_idx, :] = fold_pred[val_idx, :]
+            y_pred[val_idx, :] = fold_pred
     else:
+        data_module = RetinaDataModule(
+            df_test=data,
+            test_img_path=args.test_imgs,
+            img_size=args.img_size,
+            batch_size=args.batch_size,
+            num_workers=args.num_workers,
+            pin_memory=args.pin_memory,
+            start_col_labels=args.start_col,
+            stage='test',
+        )
         model = get_model(args.model_path, args.model_name, args.num_classes)
         y_pred = get_predictions(model, data_module, args.tta)
     
