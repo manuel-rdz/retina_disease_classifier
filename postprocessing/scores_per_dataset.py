@@ -24,37 +24,47 @@ for col in range(1, n_datasets + 1):
 
     idxs = pd.Series(idxs, name='bools')
 
+    dataset_x = y_true.iloc[idxs.values, 0].to_numpy()
+
     dataset_y_true = y_true.iloc[idxs.values, n_datasets + 1:].to_numpy(dtype=np.float32)
     dataset_y_pred = y_pred.iloc[idxs.values, :].to_numpy(dtype=np.float32)
 
-    print(dataset_y_true.shape)
-    print(dataset_y_pred.shape)
+    valid_labels = np.sum(dataset_y_true, axis=0) > 0.
+    dataset_y_true = dataset_y_true[:, valid_labels]
+    dataset_y_pred = dataset_y_pred[:, valid_labels]
+
+    cols = y_true.columns.values[n_datasets+1:]
+    cols = cols[valid_labels]
+
+    x_col = y_true.columns.values[0]
 
     avg_metrics, auc_scores, map_scores = get_scores(dataset_y_true, dataset_y_pred)
     message = get_metrics_message(*avg_metrics)
 
-    print(auc_scores.shape)
-    print(map_scores.shape)
-
     os.makedirs(os.path.join(output_path, name), exist_ok=True)
 
     np.savetxt(os.path.join(output_path, name, 'preds.csv'), 
-        dataset_y_pred,
+        np.column_stack((dataset_x, dataset_y_pred)),
+        header = ",".join(map(str, np.concatenate(([x_col], cols)))),
         delimiter =", ", 
-        fmt ='% s')
+        fmt ='% s',
+        comments='')
 
     np.savetxt(os.path.join(output_path, name, 'scores.csv'),
-        np.column_stack((np.array(auc_scores), np.array(map_scores))),
-        header='auc, map',
+        np.column_stack((cols, auc_scores, map_scores)),
+        header='Label,AUC,mAP',
         delimiter=', ',
-        fmt='% s')
+        fmt='% s',
+        comments='')
 
     message = get_metrics_message(*avg_metrics)
 
     f = open(os.path.join(output_path, name, "final_scores.txt"), "w")
     f.write(message)
     f.close()
-
+    
+    print()
+    print(name + ':')
     print(message)
 
 
