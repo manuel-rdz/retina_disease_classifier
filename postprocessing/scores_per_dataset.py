@@ -18,9 +18,15 @@ y_pred = pd.read_csv(y_pred_path, header=None)
 output_path = os.path.join(output_path, 'per_dataset_scores')
 os.makedirs(output_path, exist_ok=True)
 
-for col in range(1, n_datasets + 1):
-    name = y_true.columns.values[col]
-    idxs = y_true.iloc[:, col] == 1
+original_cols = y_true.columns.values[n_datasets+1:]
+
+score_comparison = np.zeros((len(original_cols), n_datasets * 2))
+header_score_comparison = []
+start_comparison_cols = 0
+
+for col_idx in range(1, n_datasets + 1):
+    name = y_true.columns.values[col_idx]
+    idxs = y_true.iloc[:, col_idx] == 1
 
     idxs = pd.Series(idxs, name='bools')
 
@@ -33,13 +39,18 @@ for col in range(1, n_datasets + 1):
     dataset_y_true = dataset_y_true[:, valid_labels]
     dataset_y_pred = dataset_y_pred[:, valid_labels]
 
-    cols = y_true.columns.values[n_datasets+1:]
-    cols = cols[valid_labels]
+    cols = original_cols[valid_labels]
 
     x_col = y_true.columns.values[0]
 
     avg_metrics, auc_scores, map_scores = get_scores(dataset_y_true, dataset_y_pred)
     message = get_metrics_message(*avg_metrics)
+
+    score_comparison[valid_labels, start_comparison_cols] = auc_scores
+    score_comparison[valid_labels, start_comparison_cols + 1] = map_scores
+    header_score_comparison.append(name + '_auc')
+    header_score_comparison.append(name + '_map')
+    start_comparison_cols += 2
 
     os.makedirs(os.path.join(output_path, name), exist_ok=True)
 
@@ -67,4 +78,11 @@ for col in range(1, n_datasets + 1):
     print(name + ':')
     print(message)
 
+header_score_comparison.insert(0, 'Label')
 
+np.savetxt(os.path.join(output_path, 'scores_comparison.csv'),
+    np.column_stack((original_cols, score_comparison)),
+    header=",".join(map(str, header_score_comparison)),
+    delimiter=', ',
+    fmt='% s',
+    comments='')
