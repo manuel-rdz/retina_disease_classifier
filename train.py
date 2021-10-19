@@ -31,6 +31,8 @@ parser.add_argument('--img_size', help='image size')
 parser.add_argument('--start_col', help='column where labels start')
 parser.add_argument('--seed', default=42, help='seed')
 parser.add_argument('--num_workers', default=4, help='num workers for dataloader')
+parser.add_argument('--gpus', default=1, help='number of gpus to use for training')
+parser.add_argument('--auto_gpus', default=False, help='let pytorch check how many gpus there are available')
 parser.add_argument('--pin_memory', default=False, help='pin memory for dataloader')
 parser.add_argument('--epochs', default=50, help='number of epochs to run')
 parser.add_argument('--auto_batch_size', default=False, help='use pl function to find automatically the biggest batch size possible')
@@ -104,8 +106,8 @@ if __name__ == '__main__':
             lr=args.lr)
 
         trainer = Trainer(
-            gpus=-1,
-            auto_select_gpus=True,
+            gpus=args.gpus,
+            auto_select_gpus=args.auto_gpus,
             auto_scale_batch_size=args.auto_batch_size,
             auto_lr_find=args.auto_lr, 
             deterministic=True,

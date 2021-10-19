@@ -32,6 +32,8 @@ parser.add_argument('--tta', default=1, help='number of times to apply tta')
 parser.add_argument('--model_name', help='model to load')
 parser.add_argument('--output_path', help='path to output the generated csv')
 parser.add_argument('--folds', help='number of folds to use for cross validation')
+parser.add_argument('--gpus', default=1, help='number of gpus to use for evaluation')
+parser.add_argument('--auto_gpus', default=False, help='let pythorch check how many gpus are available')
 
 
 def _parse_args():
@@ -67,20 +69,12 @@ def get_model(model_path, model_name, n_classes):
 
     
 def get_predictions(model, data_module, tta):
-    trainer = pl.Trainer(gpus=1, deterministic=True, limit_test_batches=1.0, precision=16)
+    trainer = pl.Trainer(gpus=args.gpus, auto_select_gpus=args.auto_gpus, deterministic=True, limit_test_batches=1.0, precision=16)
 
     y_pred = np.zeros(0)
 
     for i in range(tta):
         trainer.test(model, data_module)
-        
-        #auc_avg_score, auc_scores = auc_score(y_true, model.predictions)
-        #map_avg_score, map_scores = mAP_score(y_true, model.predictions)
-
-        #print('AUC_scores:')
-        #print(auc_avg_score, auc_scores)
-        #print('mAP scores:')
-        #print(map_avg_score, map_scores)
 
         if len(y_pred) == 0:
             y_pred = model.predictions

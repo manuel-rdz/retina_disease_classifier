@@ -16,3 +16,5 @@ num_workers: 1
 pin_memory: True
 tta: 1
 folds: 5
+gpus: 2
+auto_gpus: False
