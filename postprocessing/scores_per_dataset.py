@@ -11,6 +11,7 @@ y_pred_path = 'C:\\Users\\AI\\Desktop\\student_Manuel\\codes\\trained_models\\Me
 output_path = 'C:\\Users\\AI\\Desktop\\student_Manuel\\codes\\trained_models\\Merged_all\\20211011-111059-vit_base_patch16_384'
 
 n_datasets = 3
+start_col = 4
 
 y_true = pd.read_csv(y_true_path)
 y_pred = pd.read_csv(y_pred_path, header=None)
@@ -18,7 +19,7 @@ y_pred = pd.read_csv(y_pred_path, header=None)
 output_path = os.path.join(output_path, 'per_dataset_scores')
 os.makedirs(output_path, exist_ok=True)
 
-original_cols = y_true.columns.values[n_datasets+1:]
+original_cols = y_true.columns.values[start_col:]
 
 score_comparison = np.zeros((len(original_cols), n_datasets * 2))
 header_score_comparison = []
