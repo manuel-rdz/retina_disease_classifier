@@ -56,7 +56,7 @@ class MergedDataset(data.Dataset):  # for training/testing
             imgId = str(imgId) + '.tif'
             dataset_idx = 0
         elif self.image_ids.iloc[index, 2] == 1:
-            imgId = str(imgId) + '.ppm'
+            imgId = str(imgId) + '.png'
             dataset_idx = 1
         else:
             imgId = str(imgId) + '.png'

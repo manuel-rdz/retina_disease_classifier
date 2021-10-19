@@ -11,6 +11,8 @@ import yaml
 import os
 import time
 
+from resampling import utils as res_utils
+
 
 config_parser = parser = argparse.ArgumentParser(description='Training Config', add_help=False)
 parser.add_argument('-c', '--config', default='', type=str, metavar='FILE',
@@ -39,6 +41,7 @@ parser.add_argument('--auto_batch_size', default=False, help='use pl function to
 parser.add_argument('--auto_lr', default=False, help='use pl function to find automtically the best initial lr')
 parser.add_argument('--limit_train_batches', default=1.0, help='limit the number of batches to use during trainig')
 parser.add_argument('--limit_val_batches', default=1.0, help='limit the number of validation batches to use during training')
+parser.add_argument('--resampling', default='None', help='Name of the resampling algorithm to be applied on the dataset')
 
 def _parse_args():
     # Do we have a config file to parse?
@@ -92,6 +95,12 @@ if __name__ == '__main__':
         fold_path = os.path.join(output_dir, 'fold_' + str(fold_i))
         os.mkdir(fold_path)
 
+        # add resampling pipeline
+        train_x = data.iloc[train_idx, :args.start_col]
+        train_y = data.iloc[train_idx, args.start_col:]
+
+        train_x, train_y = res_utils.resample_dataset(train_x, train_y, args.resampling)
+
         checkpoint = ModelCheckpoint(
             monitor="avg_val_loss",
             dirpath=fold_path,
@@ -119,7 +128,7 @@ if __name__ == '__main__':
 
 
         data_module = RetinaDataModule(
-            df_train=data.iloc[train_idx, :],
+            df_train=train_x.join(train_y),
             df_val=data.iloc[val_idx, :],
             train_img_path=args.train_imgs,
             val_img_path=args.val_imgs,
