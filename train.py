@@ -80,17 +80,6 @@ if __name__ == '__main__':
     args_file.write(args_text)
     args_file.close()
 
-    lr_monitor = LearningRateMonitor(
-        logging_interval='step',
-        log_momentum=True,
-    )
-
-    early_stopping = EarlyStopping(
-        monitor='avg_val_loss', 
-        patience=15, 
-        verbose=True, 
-        mode='min')
-
     for fold_i, (train_idx, val_idx) in enumerate(folds.split(data, data.iloc[:, args.start_col:])):
         fold_path = os.path.join(output_dir, 'fold_' + str(fold_i))
         os.mkdir(fold_path)
@@ -100,6 +89,17 @@ if __name__ == '__main__':
         train_y = data.iloc[train_idx, args.start_col:]
 
         train_x, train_y = res_utils.resample_dataset(train_x, train_y, args.resampling)
+
+        lr_monitor = LearningRateMonitor(
+            logging_interval='step',
+            log_momentum=True,
+        )
+        
+        early_stopping = EarlyStopping(
+            monitor='avg_val_loss', 
+            patience=15, 
+            verbose=True, 
+            mode='min')
 
         checkpoint = ModelCheckpoint(
             monitor="avg_val_loss",

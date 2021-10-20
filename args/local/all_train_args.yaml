@@ -13,20 +13,20 @@ output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all\
 batch_size: 16
 lr: 0.00012
 num_classes: 34
-model: vit_base_patch16_224 
+model: vit_base_patch16_384 
 #vit_base_patch16_384 
 #efficientnet_b0
-img_size: 224
+img_size: 384
 start_col: 4
 experiment: 
 seed: 42
-num_workers: 1
+num_workers: 2
 pin_memory: True
-epochs: 1
+epochs: 200
 gpus: 1
 auto_gpus: False
 auto_batch_size: False
-auto_lr: False
+auto_lr: True
 limit_train_batches: 1.0
 limit_val_batches: 1.0
-resampling: lp_ros
+resampling: ml_rus+ml_ros

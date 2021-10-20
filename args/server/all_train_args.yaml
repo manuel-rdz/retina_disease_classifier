@@ -1,32 +1,32 @@
 ---
 data_dir: /home/kunet.ae/100058256/datasets/clean_merged_dataset_all.csv
 train_imgs:
-- /home/kunet.ae/100058256/datasets/ARIA/all_images
-- /home/kunet.ae/100058256/datasets/STARE/all-images
+- /home/kunet.ae/100058256/datasets/ARIA/all_images_crop
+- /home/kunet.ae/100058256/datasets/STARE/all_images_crop
 - /home/kunet.ae/100058256/datasets/RIADD_cropped/Training_Set/Training
 val_imgs:
-- /home/kunet.ae/100058256/datasets/ARIA/all_images
-- /home/kunet.ae/100058256/datasets/STARE/all-images
+- /home/kunet.ae/100058256/datasets/ARIA/all_images_crop
+- /home/kunet.ae/100058256/datasets/STARE/all_images_crop
 - /home/kunet.ae/100058256/datasets/RIADD_cropped/Training_Set/Training
 test_imgs:
 output_path: /home/kunet.ae/100058256/codes/trained_models/merged_all/
 batch_size: 16
 lr: 0.00012
 num_classes: 34
-model: vit_base_patch16_224 
-#vit_base_patch16_384 
+model: vit_base_patch16_384
+#vit_base_patch16_224 
 #efficientnet_b0
-img_size: 224
+img_size: 384
 start_col: 4
 experiment: 
 seed: 42
-num_workers: 1
+num_workers: 4
 pin_memory: True
-epochs: 1
-gpus: 2
-auto_gpus: False
+epochs: 200
+gpus: -1
+auto_gpus: True
 auto_batch_size: False
 auto_lr: True
 limit_train_batches: 1.0
 limit_val_batches: 1.0
-resampling: lp_ros
+resampling: ml_rus+ml_ros
