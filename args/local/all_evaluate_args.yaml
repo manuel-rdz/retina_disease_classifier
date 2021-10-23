@@ -1,13 +1,13 @@
 ---
 data_dir: C:\Users\AI\Desktop\student_Manuel\datasets\clean_merged_dataset_all.csv
 test_imgs:
-- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images
-- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all-images
+- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images_crop
+- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all_images_crop
 - C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
-model_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged_all\20211011-111059-vit_base_patch16_384
-output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged_all\20211011-111059-vit_base_patch16_384
+model_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged_all\20211022-120630-vit_base_patch16_384
+output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged_all\20211022-120630-vit_base_patch16_384
 model_name: vit_base_patch16_384
-batch_size: 8
+batch_size: 16
 num_classes: 34
 img_size: 384
 start_col: 4

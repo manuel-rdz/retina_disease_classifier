@@ -29,4 +29,5 @@ auto_batch_size: False
 auto_lr: True
 limit_train_batches: 1.0
 limit_val_batches: 1.0
-resampling: ml_rus+ml_ros
+resampling: ml_ros
+resampling_percentage: 20

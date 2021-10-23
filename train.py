@@ -42,6 +42,7 @@ parser.add_argument('--auto_lr', default=False, help='use pl function to find au
 parser.add_argument('--limit_train_batches', default=1.0, help='limit the number of batches to use during trainig')
 parser.add_argument('--limit_val_batches', default=1.0, help='limit the number of validation batches to use during training')
 parser.add_argument('--resampling', default='None', help='Name of the resampling algorithm to be applied on the dataset')
+parser.add_argument('--resampling_percentage', default=10, help='Percentage of resampling the dataset')
 
 def _parse_args():
     # Do we have a config file to parse?
@@ -88,7 +89,7 @@ if __name__ == '__main__':
         train_x = data.iloc[train_idx, :args.start_col]
         train_y = data.iloc[train_idx, args.start_col:]
 
-        train_x, train_y = res_utils.resample_dataset(train_x, train_y, args.resampling)
+        train_x, train_y = res_utils.resample_dataset(train_x, train_y, args.resampling, args.resampling_percentage)
 
         lr_monitor = LearningRateMonitor(
             logging_interval='step',
@@ -98,7 +99,8 @@ if __name__ == '__main__':
         early_stopping = EarlyStopping(
             monitor='avg_val_loss', 
             patience=15, 
-            verbose=True, 
+            verbose=True,
+            min_delta=0.01, 
             mode='min')
 
         checkpoint = ModelCheckpoint(
