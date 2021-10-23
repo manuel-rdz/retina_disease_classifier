@@ -10,11 +10,11 @@ model_name: vit_base_patch16_384
 batch_size: 8
 num_classes: 15
 img_size: 384
-start_col: 3
+start_col: 4
 seed: 42
 num_workers: 1
 pin_memory: True
-tta: 1
+tta: 3
 folds: 5
 gpus: 2
 auto_gpus: False
