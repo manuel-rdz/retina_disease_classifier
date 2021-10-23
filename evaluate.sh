@@ -23,5 +23,6 @@ pip install pandas
 pip install tensorboard
 pip install -U albumentations
 pip install pytorch-lightning
+pip install scikit-multilearn
 
 python evaluate.py -c args/server/riadd_evaluate_args.yaml

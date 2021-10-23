@@ -23,5 +23,6 @@ pip install pandas
 pip install tensorboard
 pip install -U albumentations
 pip install pytorch-lightning
+pip install scikit-multilearn
 
 python train.py -c args/server/riadd_train_args.yaml
