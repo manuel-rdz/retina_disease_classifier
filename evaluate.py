@@ -64,7 +64,7 @@ def get_model(model_path, model_name, n_classes):
 
         return retina_model
     else:
-        print('unknown extension ', model_path)
+        print('get_model::unknown model extension ', model_path)
         return None
 
     
@@ -98,10 +98,10 @@ if __name__ == '__main__':
     scores_auc = scores_map = np.zeros(args.num_classes)
 
     data = pd.read_csv(args.data_dir)
-    
-    y_pred = np.zeros((data.shape[0], data.shape[1] - args.start_col))
 
     if args.folds > 0:
+        y_pred = np.zeros((data.shape[0], data.shape[1] - args.start_col))
+
         for fold in range(args.folds):
             model_path = glob.glob(os.path.join(args.model_path, 'fold_' + str(fold), '*.ckpt'))
             model = get_model(model_path[0], args.model_name, args.num_classes)
@@ -147,7 +147,9 @@ if __name__ == '__main__':
         )
         y_true = data.iloc[:, args.start_col:].to_numpy(dtype=np.float32)
 
-        model = get_model(args.model_path, args.model_name, args.num_classes)
+        model_path = glob.glob(os.path.join(args.model_path, 'fold_0', '*.ckpt'))
+
+        model = get_model(model_path[0], args.model_name, args.num_classes)
         y_pred = get_predictions(model, data_module, args.tta)
     
         avg_metrics, scores_auc, scores_map = get_scores(y_true, y_pred)

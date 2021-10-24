@@ -52,15 +52,18 @@ class MergedDataset(data.Dataset):  # for training/testing
 
     def __getitem__(self, index):
         imgId = self.image_ids.iloc[index, 0]
-        if self.image_ids.iloc[index, 1] == 1:
+        if self.image_ids.iloc[index, 1] == 1: # ARIA
             imgId = str(imgId) + '.tif'
             dataset_idx = 0
-        elif self.image_ids.iloc[index, 2] == 1:
+        elif self.image_ids.iloc[index, 2] == 1: # STARE
             imgId = str(imgId) + '.png'
             dataset_idx = 1
-        else:
+        elif self.image_ids.iloc[index, 3] == 1: # RFMiD
             imgId = str(imgId) + '.png'
             dataset_idx = 2
+        else: # SYTHETIC
+            imgId = str(imgId) + '.png'
+            dataset_idx = 3
 
         if self.only_disease == True:
             label_2 = self.image_ids.iloc[index, 2:].values.astype(np.int64)
