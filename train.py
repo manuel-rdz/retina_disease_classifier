@@ -45,6 +45,7 @@ parser.add_argument('--limit_val_batches', default=1.0, help='limit the number o
 parser.add_argument('--resampling', default='None', help='Name of the resampling algorithm to be applied on the dataset')
 parser.add_argument('--resampling_percentage', default=10, help='Percentage of resampling the dataset')
 parser.add_argument('--folds', default=5, help='Folds to train')
+parser.add_argument('--loss', default='ASL', help='Loss function to use for the model training')
 
 def _parse_args():
     # Do we have a config file to parse?
@@ -68,6 +69,24 @@ def create_output_folder():
     os.makedirs(output_path, exist_ok=True)
     return output_path
 
+def get_class_weights(y_true):
+    y_pos = np.sum(y_true, axis=0)
+    weights = y_true.shape[0] / y_pos
+
+    return np.array(weights)
+
+def save_train_val_idxs(train_idx, val_idx, path):
+    np.savetxt(os.path.join(path, 'val_idx.csv'),
+    val_idx,
+    delimiter=', ',
+    fmt='% s')
+
+    np.savetxt(os.path.join(path, 'train_idx.csv'),
+    train_idx,
+    delimiter=', ',
+    fmt='% s')
+
+
 def train_model(train_x, train_y, val_x, val_y, out_path):
     lr_monitor = LearningRateMonitor(
         logging_interval='step',
@@ -78,7 +97,7 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         monitor='avg_val_loss', 
         patience=15, 
         verbose=True,
-        min_delta=0.01, 
+        min_delta=0.001, 
         mode='min')
 
     checkpoint = ModelCheckpoint(
@@ -92,7 +111,10 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
     model = RetinaClassifier(
         model_name=args.model, 
         n_classes=args.num_classes,
-        lr=args.lr)
+        lr=args.lr,
+        loss = args.loss,
+        weights=get_class_weights(train_y)
+    )
 
     trainer = Trainer(
         gpus=args.gpus,
@@ -144,6 +166,8 @@ if __name__ == '__main__':
         train_data = pd.DataFrame(np.empty(0))
         val_data = pd.DataFrame(np.empty(0))
 
+        fold_path = os.path.join(output_dir, 'fold_0')
+
         if args.val_data is None:
             data = pd.read_csv(args.train_data)
             folds = MultilabelStratifiedKFold(n_splits=5, shuffle=True, random_state=args.seed)
@@ -152,6 +176,8 @@ if __name__ == '__main__':
                 train_data = data.iloc[train_idx, :]
                 val_data = data.iloc[val_idx, :]
                 break
+
+            save_train_val_idxs(train_idx, val_idx, fold_path)
         else:
             train_data = pd.read_csv(args.train_data)
             val_data = pd.read_csv(args.val_data)
@@ -163,8 +189,6 @@ if __name__ == '__main__':
         val_y = val_data.iloc[:, args.start_col:]
         
         train_x, train_y = res_utils.resample_dataset(train_x, train_y, args.resampling, args.resampling_percentage)
-
-        fold_path = os.path.join(output_dir, 'fold_0')
 
         train_model(train_x, train_y, val_x, val_y, fold_path)    
     else:
@@ -183,6 +207,8 @@ if __name__ == '__main__':
             val_y = data.iloc[val_idx, args.start_col:]
 
             train_x, train_y = res_utils.resample_dataset(train_x, train_y, args.resampling, args.resampling_percentage)
+
+            save_train_val_idxs(train_idx, val_idx, fold_path)
 
             train_model(train_x, train_y, val_x, val_y, fold_path)
 

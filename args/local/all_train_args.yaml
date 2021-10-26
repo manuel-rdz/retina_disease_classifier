@@ -1,18 +1,16 @@
 ---
-train_data: C:\Users\AI\Desktop\student_Manuel\datasets\synth_data\merged_train_labels.csv
-val_data: C:\Users\AI\Desktop\student_Manuel\datasets\synth_data\merged_val_labels.csv
+train_data: C:\Users\AI\Desktop\student_Manuel\datasets\clean_merged_dataset_all.csv
+val_data:
 train_imgs:
 - C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images_crop
 - C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all_images_crop
 - C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
-- C:\Users\AI\Desktop\student_Manuel\datasets\synth_data\all_images
 val_imgs:
 - C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images_crop
 - C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all_images_crop
 - C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
-- C:\Users\AI\Desktop\student_Manuel\datasets\synth_data\all_images
 test_imgs:
-output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Synth\
+output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all\
 batch_size: 16
 lr: 0.00012
 num_classes: 34
@@ -20,7 +18,7 @@ model: vit_base_patch16_384
 #vit_base_patch16_384 
 #efficientnet_b0
 img_size: 384
-start_col: 5
+start_col: 4
 experiment: 
 seed: 42
 num_workers: 2
@@ -32,6 +30,7 @@ auto_batch_size: False
 auto_lr: True
 limit_train_batches: 1.0
 limit_val_batches: 1.0
-resampling: None
-resampling_percentage: 20
+resampling: ml_ros
+resampling_percentage: 30
 folds: 0
+loss: ASL

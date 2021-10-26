@@ -1,5 +1,5 @@
 from optimizers.AsymetricLoss import AsymmetricLossOptimized
-from models.utils import create_model
+from models.utils import create_model, get_loss_function
 
 import pytorch_lightning as pl
 import torch.optim as optim
@@ -11,13 +11,13 @@ import numpy as np
 
 
 class RetinaClassifier(pl.LightningModule):
-    def __init__(self, model_name='vit', n_classes=29, requires_grad=False, lr=0.001):
+    def __init__(self, model_name, n_classes, loss='', optimizer='', requires_grad=False, lr=0.001, weights=[]):
         super().__init__()
 
         self.model = create_model(model_name, n_classes, True, requires_grad)
 
         self.lr = lr
-        self.loss = AsymmetricLossOptimized(gamma_neg=2, gamma_pos=1)
+        self.loss = get_loss_function(loss, weights)
         self.n_classes = n_classes
 
         self.predictions = np.empty((0, n_classes), dtype=np.float32)
@@ -39,6 +39,10 @@ class RetinaClassifier(pl.LightningModule):
         x = x.view(b, -1)
 
         logits = self(x)
+
+
+        # Required for BCEwithLogits to work
+        y = y.type(torch.float16)
 
         J = self.loss(logits, y)
 
@@ -73,11 +77,14 @@ class RetinaClassifier(pl.LightningModule):
 
         preds = self(x)
 
+        # Required for BCEwithLogits to work
+        y = y.type(torch.float16)
+
         J = self.loss(preds, y)
 
-        torch.sigmoid_(preds)
+        #torch.sigmoid_(preds)
 
-        self.predictions = np.concatenate((self.predictions, preds.detach().cpu().numpy()), 0)
+        #self.predictions = np.concatenate((self.predictions, preds.detach().cpu().numpy()), 0)
 
         #results = self.validation_step(batch, batch_idx)
         #results['test_acc'] = results['val_acc']
@@ -118,7 +125,7 @@ class RetinaClassifier(pl.LightningModule):
 
         preds = self(x)
 
-        J = self.loss(preds, y)
+        #J = self.loss(preds, y)
 
         torch.sigmoid_(preds)
 

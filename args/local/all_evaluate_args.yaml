@@ -4,8 +4,8 @@ test_imgs:
 - C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images_crop
 - C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all_images_crop
 - C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
-model_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged_all\server\20211023-193516-vit_base_patch16_384
-output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged_all\server\20211023-193516-vit_base_patch16_384
+model_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged_all\20211026-210410-vit_base_patch16_384
+output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\Merged_all\20211026-210410-vit_base_patch16_384
 model_name: vit_base_patch16_384
 batch_size: 16
 num_classes: 34
@@ -14,5 +14,5 @@ start_col: 4
 seed: 42
 num_workers: 2
 pin_memory: True
-tta: 3
-folds: 5
+tta: 5
+folds: 0

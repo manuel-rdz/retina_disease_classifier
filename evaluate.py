@@ -135,8 +135,15 @@ if __name__ == '__main__':
         scores_map /= args.folds
 
     else:
+        if len(glob.glob(os.path.join(args.model_path, 'fold_0', '*.csv'))) > 0:
+            test_idx = pd.read_csv(os.path.join(args.model_path, 'fold_0','val_idx.csv')).to_numpy(dtype=np.int32).squeeze()
+        else:
+            test_idx = np.arange(data.shape[0])
+
+        y_true = data.iloc[test_idx, args.start_col:].to_numpy(dtype=np.float32)
+
         data_module = RetinaDataModule(
-            df_test=data,
+            df_test=data.iloc[test_idx],
             test_img_path=args.test_imgs,
             img_size=args.img_size,
             batch_size=args.batch_size,
@@ -145,7 +152,6 @@ if __name__ == '__main__':
             start_col_labels=args.start_col,
             stage='test',
         )
-        y_true = data.iloc[:, args.start_col:].to_numpy(dtype=np.float32)
 
         model_path = glob.glob(os.path.join(args.model_path, 'fold_0', '*.ckpt'))
 
