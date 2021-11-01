@@ -46,6 +46,7 @@ parser.add_argument('--resampling', default='None', help='Name of the resampling
 parser.add_argument('--resampling_percentage', default=10, help='Percentage of resampling the dataset')
 parser.add_argument('--folds', default=5, help='Folds to train')
 parser.add_argument('--loss', default='ASL', help='Loss function to use for the model training')
+parser.add_argument('--optimizer', default='Adam', help='Optimizer to use during training')
 
 def _parse_args():
     # Do we have a config file to parse?
@@ -95,7 +96,7 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
     
     early_stopping = EarlyStopping(
         monitor='avg_val_loss', 
-        patience=15, 
+        patience=200, 
         verbose=True,
         min_delta=0.001, 
         mode='min')
@@ -112,7 +113,8 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         model_name=args.model, 
         n_classes=args.num_classes,
         lr=args.lr,
-        loss = args.loss,
+        loss=args.loss,
+        optimizer=args.optimizer,
         weights=get_class_weights(train_y)
     )
 
@@ -167,6 +169,7 @@ if __name__ == '__main__':
         val_data = pd.DataFrame(np.empty(0))
 
         fold_path = os.path.join(output_dir, 'fold_0')
+        os.mkdir(fold_path)
 
         if args.val_data is None:
             data = pd.read_csv(args.train_data)

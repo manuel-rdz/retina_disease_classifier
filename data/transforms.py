@@ -9,6 +9,7 @@ def get_riadd_train_transforms(image_size):
         albumentations.Resize(image_size, image_size), 
         albumentations.HorizontalFlip(p=0.5),
         albumentations.VerticalFlip(p=0.5),
+        albumentations.Rotate(limit=30),
         albumentations.MedianBlur(blur_limit = 7, p=0.3),
         albumentations.GaussNoise(var_limit=(0,0.15*255), p = 0.5),
         albumentations.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=10, val_shift_limit=10, p=0.3),
@@ -39,6 +40,7 @@ def get_riadd_test_transforms(image_size):
     test_transforms = albumentations.Compose([
         albumentations.Resize(image_size, image_size),
         albumentations.HorizontalFlip(p=0.5),
+        albumentations.Rotate(limit=30),
         albumentations.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=10, val_shift_limit=10, p=0.5),
         albumentations.RandomBrightnessContrast(brightness_limit=(-0.2,0.2), contrast_limit=(-0.2, 0.2), p=0.5),
         albumentations.Normalize(

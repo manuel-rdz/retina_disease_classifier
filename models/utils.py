@@ -2,8 +2,11 @@ import timm
 import torch
 import torch.nn as nn
 import numpy as np
+import torch.optim as op
 
-from optimizers.AsymetricLoss import AsymmetricLossOptimized
+from loss.AsymetricLoss import AsymmetricLossOptimized
+from optimizer.ranger21 import Ranger21
+from pytorch_ranger import Ranger
 
 
 def create_model(model_name, n_classes, pretrained=True, requires_grad=False):
@@ -30,10 +33,14 @@ def get_loss_function(loss, weights=[]):
             weights = np.ones(34)
         return nn.BCEWithLogitsLoss(pos_weight=torch.from_numpy(weights))
 
+    return None
 
-''' TODO: Implement function to change optimizer 
-def get_optimizer(optimizer):
+
+def get_optimizer(optimizer, params, lr):
     if optimizer == 'Adam':
-        return Adam()
+        return op.Adam(params, lr)
     if optimizer == 'Ranger':
-    '''
+        return Ranger(params, lr)
+    if optimizer == 'Ranger21':
+        return Ranger21(params, lr, num_batches_per_epoch=163, num_epochs=100, use_madgrad=True)
+    

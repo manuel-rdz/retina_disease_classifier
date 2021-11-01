@@ -1,5 +1,4 @@
-from optimizers.AsymetricLoss import AsymmetricLossOptimized
-from models.utils import create_model, get_loss_function
+from models.utils import create_model, get_loss_function, get_optimizer
 
 import pytorch_lightning as pl
 import torch.optim as optim
@@ -19,6 +18,7 @@ class RetinaClassifier(pl.LightningModule):
         self.lr = lr
         self.loss = get_loss_function(loss, weights)
         self.n_classes = n_classes
+        self.optimizer = optimizer
 
         self.predictions = np.empty((0, n_classes), dtype=np.float32)
 
@@ -26,9 +26,9 @@ class RetinaClassifier(pl.LightningModule):
         return self.model(x)
 
     def configure_optimizers(self):
-        optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+        optimizer = get_optimizer(self.optimizer, self.model.parameters(), self.lr)
         lr_scheduler = {
-            'scheduler': optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=4, verbose=True),
+            'scheduler': optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, verbose=True),
             'monitor': 'avg_val_loss'}
         return [optimizer], [lr_scheduler]
 

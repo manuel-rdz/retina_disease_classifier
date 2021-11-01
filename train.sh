@@ -24,5 +24,6 @@ pip install tensorboard
 pip install -U albumentations
 pip install pytorch-lightning
 pip install scikit-multilearn
+pip install pytorch-ranger
 
 python train.py -c args/server/all_train_args.yaml

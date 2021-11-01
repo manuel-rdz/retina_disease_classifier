@@ -2,13 +2,13 @@
 train_data: C:\Users\AI\Desktop\student_Manuel\datasets\clean_merged_dataset_all.csv
 val_data:
 train_imgs:
-- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images_crop
-- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all_images_crop
-- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
+- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\blend
+- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\blend
+- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\blend
 val_imgs:
-- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images_crop
-- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all_images_crop
-- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
+- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\blend
+- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\blend
+- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\blend
 test_imgs:
 output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all\
 batch_size: 16
@@ -33,4 +33,5 @@ limit_val_batches: 1.0
 resampling: ml_ros
 resampling_percentage: 30
 folds: 0
-loss: ASL
+loss: BCE
+optimizer: Ranger
