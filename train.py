@@ -3,6 +3,8 @@ from iterstrat.ml_stratifiers import MultilabelStratifiedKFold
 from data.modules import RetinaDataModule
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor, EarlyStopping
+from resampling import utils as res_utils
+
 
 import pandas as pd
 import numpy as np
@@ -10,8 +12,6 @@ import argparse
 import yaml
 import os
 import time
-
-from resampling import utils as res_utils
 
 
 config_parser = parser = argparse.ArgumentParser(description='Training Config', add_help=False)
@@ -96,9 +96,9 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
     
     early_stopping = EarlyStopping(
         monitor='avg_val_loss', 
-        patience=200, 
+        patience=17, 
         verbose=True,
-        min_delta=0.001, 
+        min_delta=0.0001, 
         mode='min')
 
     checkpoint = ModelCheckpoint(
@@ -185,11 +185,12 @@ if __name__ == '__main__':
             train_data = pd.read_csv(args.train_data)
             val_data = pd.read_csv(args.val_data)
 
+        # Create train and val datasets
         train_x = train_data.iloc[:, :args.start_col]
-        train_y = train_data.iloc[:, args.start_col:]
+        train_y = train_data.iloc[:, args.start_col:args.start_col + args.num_classes]
 
         val_x = val_data.iloc[:, :args.start_col]
-        val_y = val_data.iloc[:, args.start_col:]
+        val_y = val_data.iloc[:, args.start_col:args.start_col + args.num_classes]
         
         train_x, train_y = res_utils.resample_dataset(train_x, train_y, args.resampling, args.resampling_percentage)
 
@@ -203,11 +204,12 @@ if __name__ == '__main__':
             fold_path = os.path.join(output_dir, 'fold_' + str(fold_i))
             os.mkdir(fold_path)
 
+            # Create train and val datasets
             train_x = data.iloc[train_idx, :args.start_col]
-            train_y = data.iloc[train_idx, args.start_col:]
+            train_y = data.iloc[train_idx, args.start_col:args.start_col + args.num_classes]
 
             val_x = data.iloc[val_idx, :args.start_col]
-            val_y = data.iloc[val_idx, args.start_col:]
+            val_y = data.iloc[val_idx, args.start_col:args.start_col + args.num_classes]
 
             train_x, train_y = res_utils.resample_dataset(train_x, train_y, args.resampling, args.resampling_percentage)
 

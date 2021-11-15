@@ -25,5 +25,6 @@ pip install -U albumentations
 pip install pytorch-lightning
 pip install scikit-multilearn
 pip install pytorch-ranger
+pip install -U iterative-stratification
 
 python evaluate.py -c args/server/all_evaluate_args.yaml

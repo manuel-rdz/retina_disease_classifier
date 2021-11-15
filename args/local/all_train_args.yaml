@@ -1,16 +1,16 @@
 ---
-train_data: C:\Users\AI\Desktop\student_Manuel\datasets\clean_merged_dataset_all.csv
+train_data: C:\Users\AI\Desktop\student_Manuel\datasets\clean_merged_dataset_v2.csv
 val_data:
 train_imgs:
-- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\blend
-- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\blend
-- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\blend
+- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images_crop
+- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all_images_crop
+- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
 val_imgs:
-- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\blend
-- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\blend
-- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\blend
+- C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images_crop
+- C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all_images_crop
+- C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
 test_imgs:
-output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all\
+output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all_v2\
 batch_size: 16
 lr: 0.00012
 num_classes: 34

@@ -100,7 +100,7 @@ if __name__ == '__main__':
     data = pd.read_csv(args.data_dir)
 
     if args.folds > 0:
-        y_pred = np.zeros((data.shape[0], data.shape[1] - args.start_col))
+        y_pred = np.zeros((data.shape[0], args.num_classes))
 
         for fold in range(args.folds):
             model_path = glob.glob(os.path.join(args.model_path, 'fold_' + str(fold), '*.ckpt'))
@@ -111,7 +111,7 @@ if __name__ == '__main__':
             fold_y_true = data.iloc[val_idx, args.start_col:].to_numpy(dtype=np.float32)
 
             data_module = RetinaDataModule(
-                df_test=data.iloc[val_idx],
+                df_test=data.iloc[val_idx, :args.start_col + args.num_classes],
                 test_img_path=args.test_imgs,
                 img_size=args.img_size,
                 batch_size=args.batch_size,
@@ -143,7 +143,7 @@ if __name__ == '__main__':
         y_true = data.iloc[test_idx, args.start_col:].to_numpy(dtype=np.float32)
 
         data_module = RetinaDataModule(
-            df_test=data.iloc[test_idx],
+            df_test=data.iloc[test_idx, :args.start_col + args.num_classes],
             test_img_path=args.test_imgs,
             img_size=args.img_size,
             batch_size=args.batch_size,
