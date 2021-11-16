@@ -99,6 +99,9 @@ if __name__ == '__main__':
 
     data = pd.read_csv(args.data_dir)
 
+    # limit data to only a subset of classes
+    data = data.iloc[:, :args.start_col + args.num_classes]
+
     if args.folds > 0:
         y_pred = np.zeros((data.shape[0], args.num_classes))
 
@@ -111,7 +114,7 @@ if __name__ == '__main__':
             fold_y_true = data.iloc[val_idx, args.start_col:].to_numpy(dtype=np.float32)
 
             data_module = RetinaDataModule(
-                df_test=data.iloc[val_idx, :args.start_col + args.num_classes],
+                df_test=data.iloc[val_idx],
                 test_img_path=args.test_imgs,
                 img_size=args.img_size,
                 batch_size=args.batch_size,
@@ -143,7 +146,7 @@ if __name__ == '__main__':
         y_true = data.iloc[test_idx, args.start_col:].to_numpy(dtype=np.float32)
 
         data_module = RetinaDataModule(
-            df_test=data.iloc[test_idx, :args.start_col + args.num_classes],
+            df_test=data.iloc[test_idx],
             test_img_path=args.test_imgs,
             img_size=args.img_size,
             batch_size=args.batch_size,

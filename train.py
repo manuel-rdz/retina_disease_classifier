@@ -173,6 +173,10 @@ if __name__ == '__main__':
 
         if args.val_data is None:
             data = pd.read_csv(args.train_data)
+
+            # limit data to only a subset of classes
+            data = data.iloc[:, :args.start_col + args.num_classes]
+
             folds = MultilabelStratifiedKFold(n_splits=5, shuffle=True, random_state=args.seed)
 
             for (train_idx, val_idx) in folds.split(data, data.iloc[:, args.start_col:]):
@@ -187,10 +191,10 @@ if __name__ == '__main__':
 
         # Create train and val datasets
         train_x = train_data.iloc[:, :args.start_col]
-        train_y = train_data.iloc[:, args.start_col:args.start_col + args.num_classes]
+        train_y = train_data.iloc[:, args.start_col:]
 
         val_x = val_data.iloc[:, :args.start_col]
-        val_y = val_data.iloc[:, args.start_col:args.start_col + args.num_classes]
+        val_y = val_data.iloc[:, args.start_col:]
         
         train_x, train_y = res_utils.resample_dataset(train_x, train_y, args.resampling, args.resampling_percentage)
 
@@ -206,10 +210,10 @@ if __name__ == '__main__':
 
             # Create train and val datasets
             train_x = data.iloc[train_idx, :args.start_col]
-            train_y = data.iloc[train_idx, args.start_col:args.start_col + args.num_classes]
+            train_y = data.iloc[train_idx, args.start_col:]
 
             val_x = data.iloc[val_idx, :args.start_col]
-            val_y = data.iloc[val_idx, args.start_col:args.start_col + args.num_classes]
+            val_y = data.iloc[val_idx, args.start_col:]
 
             train_x, train_y = res_utils.resample_dataset(train_x, train_y, args.resampling, args.resampling_percentage)
 

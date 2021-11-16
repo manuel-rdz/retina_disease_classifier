@@ -13,7 +13,7 @@ test_imgs:
 output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all_v2\
 batch_size: 16
 lr: 0.00012
-num_classes: 34
+num_classes: 15
 model: vit_base_patch16_384 
 #vit_base_patch16_384 
 #efficientnet_b0
