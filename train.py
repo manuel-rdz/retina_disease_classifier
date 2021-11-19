@@ -12,6 +12,7 @@ import argparse
 import yaml
 import os
 import time
+import random
 
 
 config_parser = parser = argparse.ArgumentParser(description='Training Config', add_help=False)
@@ -65,7 +66,11 @@ def _parse_args():
     return args, args_text
 
 def create_output_folder():
-    folder_name = time.strftime('%Y%m%d-%H%M%S') + '-' + args.model
+    # Added random number to avoid collisions duing running on server
+    random.seed(time.clock())
+    no_folder = str(random.randint(100000, 1000000))
+
+    folder_name = time.strftime('%Y%m%d-%H%M%S') + '-' + args.model + '-' + no_folder
     output_path = os.path.join(args.output_path, folder_name)
     os.makedirs(output_path, exist_ok=True)
     return output_path

@@ -1,5 +1,5 @@
 ---
-train_data: C:\Users\AI\Desktop\student_Manuel\datasets\clean_merged_dataset_v2.csv
+train_data: C:\Users\AI\Desktop\student_Manuel\datasets\merged_drop_150.csv
 val_data:
 train_imgs:
 - C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images_crop
@@ -13,7 +13,7 @@ test_imgs:
 output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all_v2\
 batch_size: 16
 lr: 0.00012
-num_classes: 15
+num_classes: 34
 model: vit_base_patch16_384 
 #vit_base_patch16_384 
 #efficientnet_b0
