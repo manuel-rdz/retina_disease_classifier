@@ -67,7 +67,7 @@ def _parse_args():
 
 def create_output_folder():
     # Added random number to avoid collisions duing running on server
-    random.seed(time.clock())
+    random.seed(time.perf_counter_ns())
     no_folder = str(random.randint(100000, 1000000))
 
     folder_name = time.strftime('%Y%m%d-%H%M%S') + '-' + args.model + '-' + no_folder
