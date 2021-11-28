@@ -93,11 +93,13 @@ if __name__ == '__main__':
 
     pl.seed_everything(args.seed)
 
-    #bin_auc, bin_map, labels_auc, labels_map
-    avg_metrics = np.zeros(4)
-    scores_auc = scores_map = np.zeros(args.num_classes)
+    #bin_auc, bin_f1, labels_auc, labels_map, labels_f1
+    avg_metrics = np.zeros(5)
+    scores_auc = scores_map = scores_f1 = np.zeros(args.num_classes)
 
     data = pd.read_csv(args.data_dir)
+    NORMAL_COL_IDX = list(data.columns.values).index('NORMAL') - args.start_col
+    print(NORMAL_COL_IDX)
 
     # limit data to only a subset of classes
     data = data.iloc[:, :args.start_col + args.num_classes]
@@ -125,17 +127,19 @@ if __name__ == '__main__':
             )
 
             fold_y_pred = get_predictions(model, data_module, args.tta)
-            fold_avg_metrics, fold_scores_auc, fold_scores_map = get_scores(fold_y_true, fold_y_pred)
+            fold_avg_metrics, fold_scores_auc, fold_scores_map, fold_scores_f1 = get_scores(fold_y_true, fold_y_pred, NORMAL_COL_IDX)
 
             avg_metrics = np.add(avg_metrics, fold_avg_metrics)
             scores_auc = np.add(scores_auc, fold_scores_auc)
             scores_map = np.add(scores_map, fold_scores_map)
+            scores_f1 = np.add(scores_f1, fold_scores_f1)
 
             y_pred[val_idx] = fold_y_pred
 
         avg_metrics /= args.folds
         scores_auc /= args.folds
         scores_map /= args.folds
+        scores_f1 /= args.folds
 
     else:
         if len(glob.glob(os.path.join(args.model_path, 'fold_0', '*.csv'))) > 0:
@@ -161,18 +165,7 @@ if __name__ == '__main__':
         model = get_model(model_path[0], args.model_name, args.num_classes)
         y_pred = get_predictions(model, data_module, args.tta)
     
-        avg_metrics, scores_auc, scores_map = get_scores(y_true, y_pred)
-
-    np.savetxt(os.path.join(args.output_path, 'preds.csv'), 
-        y_pred,
-        delimiter =", ", 
-        fmt ='% s')
-
-    np.savetxt(os.path.join(args.output_path, 'scores.csv'),
-        np.column_stack((scores_auc, scores_map)),
-        header='auc, map',
-        delimiter=', ',
-        fmt='% s')
+        avg_metrics, scores_auc, scores_map, scores_f1 = get_scores(y_true, y_pred, NORMAL_COL_IDX)
 
     message = get_metrics_message(*avg_metrics)
 
@@ -181,3 +174,14 @@ if __name__ == '__main__':
     f.close()
 
     print(message)
+
+    np.savetxt(os.path.join(args.output_path, 'preds.csv'), 
+        y_pred,
+        delimiter =", ", 
+        fmt ='% s')
+
+    np.savetxt(os.path.join(args.output_path, 'scores.csv'),
+        np.column_stack((scores_auc, scores_map, scores_f1)),
+        header='auc, map, f1',
+        delimiter=', ',
+        fmt='% s')

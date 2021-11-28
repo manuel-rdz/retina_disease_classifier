@@ -28,7 +28,7 @@ class RetinaClassifier(pl.LightningModule):
     def configure_optimizers(self):
         optimizer = get_optimizer(self.optimizer, self.model.parameters(), self.lr)
         lr_scheduler = {
-            'scheduler': optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, verbose=True),
+            'scheduler': optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, verbose=True, threshold=0.0005),
             'monitor': 'avg_val_loss'}
         return [optimizer], [lr_scheduler]
 

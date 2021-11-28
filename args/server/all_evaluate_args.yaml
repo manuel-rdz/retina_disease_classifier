@@ -1,8 +1,8 @@
 ---
 data_dir: /home/kunet.ae/100058256/datasets/clean_merged_dataset_v2.csv
 test_imgs:
-- /home/kunet.ae/100058256/datasets/ARIA/all_images
-- /home/kunet.ae/100058256/datasets/STARE/all-images
+- /home/kunet.ae/100058256/datasets/ARIA/all_images_crop
+- /home/kunet.ae/100058256/datasets/STARE/all_images_crop
 - /home/kunet.ae/100058256/datasets/RIADD_cropped/Training_Set/Training
 model_path:  /home/kunet.ae/100058256/codes/trained_models/merged_all_v2/20211007-094150-vit_base_patch16_384/
 output_path: /home/kunet.ae/100058256/codes/trained_models/merged_all_v2/20211007-094150-vit_base_patch16_384/
@@ -12,7 +12,7 @@ num_classes: 34
 img_size: 384
 start_col: 4
 seed: 42
-num_workers: 2
+num_workers: 4
 pin_memory: True
 tta: 5
 folds: 0

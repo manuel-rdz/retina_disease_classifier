@@ -103,7 +103,7 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         monitor='avg_val_loss', 
         patience=17, 
         verbose=True,
-        min_delta=0.0001, 
+        min_delta=0.0005, 
         mode='min')
 
     checkpoint = ModelCheckpoint(

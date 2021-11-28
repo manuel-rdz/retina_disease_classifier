@@ -1,14 +1,14 @@
 ---
-data_dir: C:\Users\AI\Desktop\student_Manuel\datasets\merged_drop_150.csv
+data_dir: C:\Users\AI\Desktop\student_Manuel\datasets\drop_all\30_labels\merged_30_labels_drop_7.5_perc.csv
 test_imgs:
 - C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images_crop
 - C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all_images_crop
 - C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
-model_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all_v2\20211118-211717-vit_base_patch16_384
-output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all_v2\20211118-211717-vit_base_patch16_384
+model_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all_v2\20211128-122930-vit_base_patch16_384-275662
+output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all_v2\20211128-122930-vit_base_patch16_384-275662
 model_name: vit_base_patch16_384
 batch_size: 16
-num_classes: 34
+num_classes: 29
 img_size: 384
 start_col: 4
 seed: 42
