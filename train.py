@@ -117,6 +117,7 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
     model = RetinaClassifier(
         model_name=args.model, 
         n_classes=args.num_classes,
+        input_size=args.img_size,
         lr=args.lr,
         loss=args.loss,
         optimizer=args.optimizer,

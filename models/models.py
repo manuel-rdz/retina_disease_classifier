@@ -10,10 +10,10 @@ import numpy as np
 
 
 class RetinaClassifier(pl.LightningModule):
-    def __init__(self, model_name, n_classes, loss='', optimizer='', requires_grad=False, lr=0.001, weights=[]):
+    def __init__(self, model_name, n_classes, input_size,loss='', optimizer='', requires_grad=False, lr=0.001, weights=[]):
         super().__init__()
 
-        self.model = create_model(model_name, n_classes, True, requires_grad)
+        self.model = create_model(model_name, n_classes, input_size, True, requires_grad)
 
         self.lr = lr
         self.loss = get_loss_function(loss, weights)

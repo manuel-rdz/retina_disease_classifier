@@ -1,5 +1,5 @@
 ---
-train_data: C:\Users\AI\Desktop\student_Manuel\datasets\drop_all\30_labels\merged_30_labels_drop_7.5_perc.csv
+train_data: C:\Users\AI\Desktop\student_Manuel\datasets\drop_all\20_labels\merged_20_labels_drop_10.0_perc.csv
 val_data:
 train_imgs:
 - C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images_crop
@@ -13,11 +13,11 @@ test_imgs:
 output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all_v2\
 batch_size: 16
 lr: 0.00011
-num_classes: 30
+num_classes: 20
 model: vit_base_patch16_384 
 #vit_base_patch16_384 
 #efficientnet_b0
-img_size: 384
+img_size: 608
 start_col: 4
 experiment: 
 seed: 42
@@ -27,7 +27,7 @@ epochs: 200
 gpus: 1
 auto_gpus: False
 auto_batch_size: False
-auto_lr: True
+auto_lr: False
 limit_train_batches: 1.0
 limit_val_batches: 1.0
 resampling: ml_ros

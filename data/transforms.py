@@ -36,17 +36,19 @@ def get_riadd_valid_transforms(image_size):
     return valid_transforms
 
 
-def get_riadd_test_transforms(image_size):
-    test_transforms = albumentations.Compose([
-        albumentations.Resize(image_size, image_size),
-        albumentations.HorizontalFlip(p=0.5),
-        albumentations.Rotate(limit=30),
-        albumentations.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=10, val_shift_limit=10, p=0.5),
-        albumentations.RandomBrightnessContrast(brightness_limit=(-0.2,0.2), contrast_limit=(-0.2, 0.2), p=0.5),
-        albumentations.Normalize(
-            mean=[0.485, 0.456, 0.406],
-            std=[0.229, 0.224, 0.225],
-        ),
-        ToTensorV2(),
-    ])
-    return test_transforms
+def get_riadd_test_transforms(image_size, use_tta):
+    if use_tta: 
+        return albumentations.Compose([
+            albumentations.Resize(image_size, image_size),
+            albumentations.HorizontalFlip(p=0.5),
+            albumentations.Rotate(limit=30),
+            albumentations.HueSaturationValue(hue_shift_limit=10,   sat_shift_limit=10, val_shift_limit=10, p=0.5),
+            albumentations.RandomBrightnessContrast(brightness_limit=(-0.2,0.2),contrast_limit=(-0.2, 0.2), p=0.5),
+            albumentations.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225],
+            ),
+            ToTensorV2(),
+        ])
+    
+    return get_riadd_valid_transforms(image_size)

@@ -71,6 +71,10 @@ def get_model(model_path, model_name, n_classes):
 def get_predictions(model, data_module, tta):
     trainer = pl.Trainer(gpus=args.gpus, auto_select_gpus=args.auto_gpus, deterministic=True, limit_test_batches=1.0, precision=16)
 
+    if tta == 0:
+        trainer.test(model, data_module)
+        return model.predictions
+
     y_pred = np.zeros(0)
 
     for i in range(tta):
@@ -157,6 +161,7 @@ if __name__ == '__main__':
             num_workers=args.num_workers,
             pin_memory=args.pin_memory,
             start_col_labels=args.start_col,
+            use_tta=(args.tta > 0),
             stage='test',
         )
 

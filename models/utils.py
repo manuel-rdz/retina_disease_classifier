@@ -9,8 +9,8 @@ from optimizer.ranger21 import Ranger21
 from pytorch_ranger import Ranger
 
 
-def create_model(model_name, n_classes, pretrained=True, requires_grad=False):
-    model = timm.create_model(model_name, pretrained=pretrained)
+def create_model(model_name, n_classes, input_size, pretrained=True, requires_grad=False):
+    model = timm.create_model(model_name,pretrained=pretrained, img_size=input_size)
 
     for param in model.parameters():
         param.requires_grad = requires_grad
