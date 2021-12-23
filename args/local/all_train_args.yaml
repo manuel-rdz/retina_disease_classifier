@@ -14,7 +14,8 @@ output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all_
 batch_size: 16
 lr: 0.00011
 num_classes: 20
-model: deit_base_patch16_384 
+model: beit_base_patch16_384
+#deit_base_patch16_384 
 #vit_base_patch16_384 
 #efficientnet_b0
 img_size: 384
@@ -35,3 +36,4 @@ resampling_percentage: 30
 folds: 0
 loss: BCE
 optimizer: Ranger
+scheduler_threshold: 5e-4

@@ -2,15 +2,12 @@ from models.utils import create_model, get_loss_function, get_optimizer
 
 import pytorch_lightning as pl
 import torch.optim as optim
-import torchmetrics as tm
-import torch.nn as nn
 import torch
-import timm
 import numpy as np
 
 
 class RetinaClassifier(pl.LightningModule):
-    def __init__(self, model_name, n_classes, input_size,loss='', optimizer='', requires_grad=False, lr=0.001, weights=[]):
+    def __init__(self, model_name, n_classes, input_size,loss='', optimizer='', requires_grad=False, lr=0.001, threshold=0.0005, weights=[]):
         super().__init__()
 
         self.model = create_model(model_name, n_classes, input_size, True, requires_grad)
@@ -19,6 +16,7 @@ class RetinaClassifier(pl.LightningModule):
         self.loss = get_loss_function(loss, weights)
         self.n_classes = n_classes
         self.optimizer = optimizer
+        self.threshold = threshold
 
         self.predictions = np.empty((0, n_classes), dtype=np.float32)
 
@@ -28,7 +26,7 @@ class RetinaClassifier(pl.LightningModule):
     def configure_optimizers(self):
         optimizer = get_optimizer(self.optimizer, self.model.parameters(), self.lr)
         lr_scheduler = {
-            'scheduler': optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, verbose=True, threshold=0.0005),
+            'scheduler': optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, verbose=True, threshold=self.threshold),
             'monitor': 'avg_val_loss'}
         return [optimizer], [lr_scheduler]
 

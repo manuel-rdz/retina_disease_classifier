@@ -1,5 +1,5 @@
-import timm
 import torch
+import timm
 import torch.nn as nn
 import numpy as np
 import torch.optim as op
@@ -10,7 +10,11 @@ from pytorch_ranger import Ranger
 
 
 def create_model(model_name, n_classes, input_size, pretrained=True, requires_grad=False):
-    model = timm.create_model(model_name, pretrained=pretrained, img_size=input_size)
+
+    if 'beit' in model_name: 
+        model = timm.create_model(model_name, pretrained=pretrained)
+    else:
+        model = timm.create_model(model_name, pretrained=pretrained, img_size=input_size)
 
     for param in model.parameters():
         param.requires_grad = requires_grad
@@ -18,7 +22,7 @@ def create_model(model_name, n_classes, input_size, pretrained=True, requires_gr
     if 'distilled' in model_name:
         model.head = nn.Linear(model.head.in_features, n_classes)
         model.head_dist = nn.Linear(model.head_dist.in_features, n_classes)
-    elif any(name in model_name for name in ['vit', 'xcit', 'deit']):
+    elif any(name in model_name for name in ['vit', 'xcit', 'deit', 'beit']):
         model.head = nn.Linear(model.head.in_features, n_classes)
     elif 'efficientnet' in model_name:
         model.classifier = nn.Linear(model.classifier.in_features, n_classes)

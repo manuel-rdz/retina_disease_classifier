@@ -48,6 +48,7 @@ parser.add_argument('--resampling_percentage', default=10, help='Percentage of r
 parser.add_argument('--folds', default=5, help='Folds to train')
 parser.add_argument('--loss', default='ASL', help='Loss function to use for the model training')
 parser.add_argument('--optimizer', default='Adam', help='Optimizer to use during training')
+parser.add_argument('--scheduler_threshold', default=1e-4, help='min threshold value for schedulers')
 
 def _parse_args():
     # Do we have a config file to parse?
@@ -103,7 +104,7 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         monitor='avg_val_loss', 
         patience=17, 
         verbose=True,
-        min_delta=0.0005, 
+        min_delta=args.scheduler_threshold, 
         mode='min')
 
     checkpoint = ModelCheckpoint(
@@ -121,6 +122,7 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         lr=args.lr,
         loss=args.loss,
         optimizer=args.optimizer,
+        threshold=args.threshold,
         weights=get_class_weights(train_y)
     )
 
