@@ -10,12 +10,15 @@ from pytorch_ranger import Ranger
 
 
 def create_model(model_name, n_classes, input_size, pretrained=True, requires_grad=False):
-    model = timm.create_model(model_name,pretrained=pretrained, img_size=input_size)
+    model = timm.create_model(model_name, pretrained=pretrained, img_size=input_size)
 
     for param in model.parameters():
         param.requires_grad = requires_grad
     
-    if 'vit' in model_name:
+    if 'distilled' in model_name:
+        model.head = nn.Linear(model.head.in_features, n_classes)
+        model.head_dist = nn.Linear(model.head_dist.in_features, n_classes)
+    elif any(name in model_name for name in ['vit', 'xcit', 'deit']):
         model.head = nn.Linear(model.head.in_features, n_classes)
     elif 'efficientnet' in model_name:
         model.classifier = nn.Linear(model.classifier.in_features, n_classes)

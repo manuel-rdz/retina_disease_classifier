@@ -53,11 +53,11 @@ def _parse_args():
     return args, args_text
 
 
-def get_model(model_path, model_name, n_classes):
+def get_model(model_path, model_name, n_classes, input_size):
     if '.ckpt' in model_path:
-        return RetinaClassifier.load_from_checkpoint(model_path, model_name=model_name, n_classes=n_classes)
+        return RetinaClassifier.load_from_checkpoint(model_path, model_name=model_name, n_classes=n_classes, input_size=input_size)
     elif '.pth.tar' in model_path:
-        retina_model = RetinaClassifier(model_name=model_name, n_classes=n_classes)
+        retina_model = RetinaClassifier(model_name=model_name, n_classes=n_classes, input_size=input_size)
 
         state_dict = torch.load(model_path, map_location='cpu')
         retina_model.model.load_state_dict(state_dict["state_dict"], strict=True)
@@ -167,7 +167,7 @@ if __name__ == '__main__':
 
         model_path = glob.glob(os.path.join(args.model_path, 'fold_0', '*.ckpt'))
 
-        model = get_model(model_path[0], args.model_name, args.num_classes)
+        model = get_model(model_path[0], args.model_name, args.num_classes, args.img_size)
         y_pred = get_predictions(model, data_module, args.tta)
     
         avg_metrics, scores_auc, scores_map, scores_f1 = get_scores(y_true, y_pred, NORMAL_COL_IDX)

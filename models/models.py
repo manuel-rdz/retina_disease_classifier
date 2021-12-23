@@ -40,7 +40,6 @@ class RetinaClassifier(pl.LightningModule):
 
         logits = self(x)
 
-
         # Required for BCEwithLogits to work
         y = y.type(torch.float16)
 
