@@ -1,5 +1,7 @@
-import timm
+#import timm
 
-print(timm.list_models('*beit*', pretrained=True))
+#print(timm.list_models('xcit_medium*', pretrained=True))
+
+
 
 

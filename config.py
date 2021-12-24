@@ -1,0 +1,1 @@
+normal_column_idx = 1

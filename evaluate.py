@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import os
 import glob
+import config
 
 from data.modules import RetinaDataModule
 from models.models import RetinaClassifier
@@ -93,6 +94,7 @@ def get_predictions(model, data_module, tta):
 
 
 if __name__ == '__main__':
+    config.init()
     args, args_text = _parse_args()
 
     pl.seed_everything(args.seed)
@@ -102,8 +104,7 @@ if __name__ == '__main__':
     scores_auc = scores_map = scores_f1 = np.zeros(args.num_classes)
 
     data = pd.read_csv(args.data_dir)
-    NORMAL_COL_IDX = list(data.columns.values).index('NORMAL') - args.start_col
-    print(NORMAL_COL_IDX)
+    #NORMAL_COL_IDX = list(data.columns.values).index('NORMAL') - args.start_col
 
     # limit data to only a subset of classes
     data = data.iloc[:, :args.start_col + args.num_classes]
@@ -131,7 +132,7 @@ if __name__ == '__main__':
             )
 
             fold_y_pred = get_predictions(model, data_module, args.tta)
-            fold_avg_metrics, fold_scores_auc, fold_scores_map, fold_scores_f1 = get_scores(fold_y_true, fold_y_pred, NORMAL_COL_IDX)
+            fold_avg_metrics, fold_scores_auc, fold_scores_map, fold_scores_f1 = get_scores(fold_y_true, fold_y_pred, config.normal_column_idx)
 
             avg_metrics = np.add(avg_metrics, fold_avg_metrics)
             scores_auc = np.add(scores_auc, fold_scores_auc)
@@ -170,7 +171,7 @@ if __name__ == '__main__':
         model = get_model(model_path[0], args.model_name, args.num_classes, args.img_size)
         y_pred = get_predictions(model, data_module, args.tta)
     
-        avg_metrics, scores_auc, scores_map, scores_f1 = get_scores(y_true, y_pred, NORMAL_COL_IDX)
+        avg_metrics, scores_auc, scores_map, scores_f1 = get_scores(y_true, y_pred, config.normal_column_idx)
 
     message = get_metrics_message(*avg_metrics)
 

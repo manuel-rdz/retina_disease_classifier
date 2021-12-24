@@ -13,6 +13,7 @@ import yaml
 import os
 import time
 import random
+import config
 
 
 config_parser = parser = argparse.ArgumentParser(description='Training Config', add_help=False)
@@ -122,7 +123,8 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         lr=args.lr,
         loss=args.loss,
         optimizer=args.optimizer,
-        threshold=args.threshold,
+        threshold=args.scheduler_threshold,
+        output_path=out_path,
         weights=get_class_weights(train_y)
     )
 

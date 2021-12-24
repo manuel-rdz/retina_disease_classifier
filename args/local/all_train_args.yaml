@@ -36,4 +36,4 @@ resampling_percentage: 30
 folds: 0
 loss: BCE
 optimizer: Ranger
-scheduler_threshold: 5e-4
+scheduler_threshold: 0.0005

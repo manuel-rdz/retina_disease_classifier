@@ -1,13 +1,16 @@
+from utils.metrics import get_scores, get_short_metrics_message
 from models.utils import create_model, get_loss_function, get_optimizer
 
 import pytorch_lightning as pl
 import torch.optim as optim
 import torch
+import config
+import os
 import numpy as np
 
 
 class RetinaClassifier(pl.LightningModule):
-    def __init__(self, model_name, n_classes, input_size,loss='', optimizer='', requires_grad=False, lr=0.001, threshold=0.0005, weights=[]):
+    def __init__(self, model_name, n_classes, input_size,loss='', optimizer='', requires_grad=False, lr=0.001, threshold=0.0005, weights=[], output_path=''):
         super().__init__()
 
         self.model = create_model(model_name, n_classes, input_size, True, requires_grad)
@@ -19,6 +22,10 @@ class RetinaClassifier(pl.LightningModule):
         self.threshold = threshold
 
         self.predictions = np.empty((0, n_classes), dtype=np.float32)
+        self.target = np.empty((0, n_classes), dtype=np.int16)
+
+        self.best_model_score = 0.0
+        self.output_path = output_path
 
     def forward(self, x):
         return self.model(x)
@@ -43,21 +50,6 @@ class RetinaClassifier(pl.LightningModule):
 
         J = self.loss(logits, y)
 
-        #torch.sigmoid_(logits)
-        #auc_score = tm.functional.auroc(logits, y, num_classes=self.n_classes)
-
-        #auc_score = 0
-        #for i in range(logits.size()[1]):
-        #   auc_score += tm.functional.auroc(logits[:, i], y[:, i])
-
-        #auc_score /= logits.size()[1]
-        #acc = tm.functional.auc(torch.sigmoid(logits), y)
-
-        #acc = tm.functional.accuracy(logits, y)
-
-        #self.log("train_loss", J, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        #self.log('acc', acc, on_step=True, on_epoch=True, prog_bar=True, #logger=True)  
-
 
         #pbar = {'train_acc': acc}
         
@@ -78,6 +70,9 @@ class RetinaClassifier(pl.LightningModule):
         y = y.type(torch.float16)
 
         J = self.loss(preds, y)
+
+        self.predictions = np.concatenate((self.predictions, preds.detach().cpu().numpy()), 0)
+        self.target = np.concatenate((self.target, y.detach().cpu().numpy()), 0)
 
         #torch.sigmoid_(preds)
 
@@ -101,15 +96,25 @@ class RetinaClassifier(pl.LightningModule):
 
     def validation_epoch_end(self, val_step_outputs):
         avg_val_loss = torch.tensor([x['val_loss'] for x in val_step_outputs]).mean()
-        #avg_val_acc = torch.tensor([x['val_acc'] for x in val_step_outputs]).mean()
-
-        #print('val auc score')
-        #print(avg_val_acc)
 
         self.log("avg_val_loss", avg_val_loss, on_epoch=True, prog_bar=True, logger=True)
-        #self.log('avg_val_acc', avg_val_acc, on_epoch=True, prog_bar=True, logger=True)  
 
-        #pbar = {'avg_val_acc': avg_val_acc}
+        avg_metrics, _, _, _ = get_scores(self.target, self.predictions, config.normal_column_idx)
+
+        model_score = ((avg_metrics[2] + avg_metrics[3]) / 2.0 + avg_metrics[0])/ 2.0
+
+        if model_score > self.best_model_score:
+            short_msg = get_short_metrics_message(*avg_metrics)
+            print(short_msg)
+
+            f = open(os.path.join(self.output_path, "final_scores.txt"), "w")
+            f.write(short_msg)
+            f.close()
+
+            self.best_model_score = model_score
+
+        # clear preds and target
+        self.clean_metrics_arrays()
 
         return {'avg_val_loss': avg_val_loss}
                 #'avg_val_acc': avg_val_acc} #, 'progress_bar': pbar}
@@ -146,5 +151,6 @@ class RetinaClassifier(pl.LightningModule):
 
         #return avg_metrics
 
-    def clean_predictions(self):
+    def clean_metrics_arrays(self):
         self.predictions = np.empty((0, self.n_classes), dtype=np.float32)
+        self.target = np.empty((0, self.n_classes), dtype=np.int16)

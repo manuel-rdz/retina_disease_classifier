@@ -26,7 +26,7 @@ def __calculate_metric(y_true, y_pred, metric):
 def calculate_metric(y_true, y_pred, metric):
     metric = metric.lower()
     y_pred_bin = (y_pred > 0.5)
-    print('Errors for metric ', metric)
+    #print('Errors for metric ', metric)
 
     if metric == 'auc':
         return __calculate_metric(y_true, y_pred, roc_auc_score)
@@ -43,23 +43,33 @@ def calculate_metric(y_true, y_pred, metric):
     return np.empty(0), np.empty(0) 
 
 
-def get_metrics_message(bin_auc, bin_f1, labels_auc, labels_map, labels_f1):
-    #task2_score = (labels_auc + labels_map) / 2
+def get_short_metrics_message(bin_auc, bin_f1, labels_auc, labels_map, labels_f1):
 
-    #final_score = (bin_auc + task2_score) / 2
+    ml_score = (labels_auc + labels_map) / 2.0
+    model_score = (bin_auc + ml_score) / 2.0
+
+    msg = 'ml_auc, ml_map, ml_f1, bin_auc, bin_f1, ml_score, model_score\n'
+    msg += '{}\n{}\n{}\n{}\n{}\n{}\n{}'.format(labels_auc, labels_map, labels_f1, bin_auc, bin_f1, ml_score, model_score)
+
+    return msg
+
+def get_full_metrics_message(bin_auc, bin_f1, labels_auc, labels_map, labels_f1):
+    ml_score = (labels_auc + labels_map) / 2.0
+    model_score = (bin_auc + ml_score) / 2.0
 
     msg = '----- Multilabel scores -----\n'
     msg += 'auc_score: {}\n'.format(labels_auc)
     msg += 'mAP: {}\n'.format(labels_map)
     msg += 'f1: {}\n'.format(labels_f1)
-    #msg += 'task score: {}\n'.format(task2_score)
     msg += '----- Binary scores -----\n'
     msg += 'auc: {}\n'.format(bin_auc)
     msg += 'f1: {}\n'.format(bin_f1)
-    #msg += '----- Final Score -----\n'
-    #msg += str(final_score)
+    msg += '----- Multilabel Score -----\n'
+    msg += 'ml_score: {}\n'.format(ml_score)
+    msg += '----- Final Score -----\n'
+    msg += 'model_score: {}\n'.format(model_score)
     msg += '----- Copy-Paste -----\n'
-    msg += '{},{},{},{},{}'.format(labels_auc, labels_map, labels_f1, bin_auc, bin_f1)
+    msg += '{}\n{}\n{}\n{}\n{}\n{}\n{}'.format(labels_auc, labels_map, labels_f1, bin_auc, bin_f1, ml_score, model_score)
 
     return msg
 
