@@ -22,7 +22,7 @@ def create_model(model_name, n_classes, input_size, pretrained=True, requires_gr
     if 'distilled' in model_name:
         model.head = nn.Linear(model.head.in_features, n_classes)
         model.head_dist = nn.Linear(model.head_dist.in_features, n_classes)
-    elif any(name in model_name for name in ['vit', 'xcit', 'deit', 'beit']):
+    elif any(name in model_name for name in ['vit', 'xcit', 'deit', 'beit', 'swin']):
         model.head = nn.Linear(model.head.in_features, n_classes)
     elif 'efficientnet' in model_name:
         model.classifier = nn.Linear(model.classifier.in_features, n_classes)

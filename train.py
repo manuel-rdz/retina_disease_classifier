@@ -79,7 +79,7 @@ def create_output_folder():
 
 def get_class_weights(y_true):
     y_pos = np.sum(y_true, axis=0)
-    weights = y_true.shape[0] / y_pos
+    weights = y_pos.max() / y_pos
 
     return np.array(weights)
 
@@ -106,7 +106,7 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         patience=17, 
         verbose=True,
         min_delta=args.scheduler_threshold, 
-        mode='min')
+        mode='min') 
 
     checkpoint = ModelCheckpoint(
         monitor="avg_val_loss",

@@ -14,7 +14,7 @@ output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_all_
 batch_size: 16
 lr: 0.00011
 num_classes: 20
-model: beit_base_patch16_384
+model: swin_base_patch4_window12_384_in22k
 #deit_base_patch16_384 
 #vit_base_patch16_384 
 #efficientnet_b0
@@ -32,8 +32,8 @@ auto_lr: True
 limit_train_batches: 1.0
 limit_val_batches: 1.0
 resampling: ml_ros
-resampling_percentage: 30
+resampling_percentage: 10
 folds: 0
 loss: BCE
 optimizer: Ranger
-scheduler_threshold: 0.0005
+scheduler_threshold: 0.0003
