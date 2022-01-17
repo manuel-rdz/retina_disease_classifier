@@ -11,7 +11,7 @@ from pytorch_ranger import Ranger
 
 def create_model(model_name, n_classes, input_size, pretrained=True, requires_grad=False):
 
-    if 'beit' in model_name: 
+    if any(name in model_name for name in ['beit', 'vgg16', 'resnet101']):
         model = timm.create_model(model_name, pretrained=pretrained)
     else:
         model = timm.create_model(model_name, pretrained=pretrained, img_size=input_size)
@@ -26,6 +26,10 @@ def create_model(model_name, n_classes, input_size, pretrained=True, requires_gr
         model.head = nn.Linear(model.head.in_features, n_classes)
     elif 'efficientnet' in model_name:
         model.classifier = nn.Linear(model.classifier.in_features, n_classes)
+    elif 'vgg16' in model_name:
+        model.head.fc = nn.Linear(model.head.fc.in_features, n_classes)
+    elif 'resnet101' in model_name:
+        model.fc = nn.Linear(model.fc.in_features, n_classes)
 
     return model
 
@@ -46,6 +50,8 @@ def get_loss_function(loss, weights=[]):
 def get_optimizer(optimizer, params, lr):
     if optimizer == 'Adam':
         return op.Adam(params, lr)
+    if optimizer == 'SGD':
+        return op.SGD(params, lr)
     if optimizer == 'Ranger':
         return Ranger(params, lr)
     if optimizer == 'Ranger21':

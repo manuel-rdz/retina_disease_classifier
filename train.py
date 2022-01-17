@@ -150,6 +150,7 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         num_workers=args.num_workers,
         pin_memory=args.pin_memory,
         start_col_labels=args.start_col,
+        transforms=args.transforms,
     )
 
     if args.auto_lr:

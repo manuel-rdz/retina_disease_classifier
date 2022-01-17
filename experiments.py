@@ -1,7 +1,13 @@
 import timm
+import torch.nn as nn
 
-print(timm.list_models('*swin*', pretrained=True))
+print(timm.list_models('*resnet101*', pretrained=True))
 
+model = timm.create_model('resnet101', pretrained=False)
+print(model)
+
+model.fc = nn.Linear(model.fc.in_features, 20)
+print(model)
 
 '''
 Calculation based on 

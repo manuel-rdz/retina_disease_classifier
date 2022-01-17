@@ -36,3 +36,4 @@ folds: 0
 loss: BCE
 optimizer: Ranger
 scheduler_threshold: 0.0005
+transforms: vgg16

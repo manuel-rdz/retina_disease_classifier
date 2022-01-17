@@ -2,13 +2,14 @@ from data.transforms import get_riadd_test_transforms, get_riadd_train_transform
 from torch.utils.data import DataLoader
 
 import pytorch_lightning as pl
-import pandas as pd
 
-from data.utils import get_dataset
+from data.utils import get_dataset, get_transformations
 
 
 class RetinaDataModule(pl.LightningDataModule):
-    def __init__(self, df_train=None, df_val=None, df_test=None, train_img_path = '', val_img_path = '', test_img_path = '', img_size = 224, batch_size=32, num_workers=4, pin_memory=False, start_col_labels = 1, stage='fit', use_tta=False):
+    def __init__(self, df_train=None, df_val=None, df_test=None, train_img_path='', val_img_path='',
+                 test_img_path='', img_size=224, batch_size=32, num_workers=4, pin_memory=False,
+                 start_col_labels=1, stage='fit', use_tta=False, transforms='riadd'):
         super().__init__()
 
         self.df_train = df_train
@@ -28,17 +29,18 @@ class RetinaDataModule(pl.LightningDataModule):
         self.stage = stage
         self.use_tta = use_tta
 
+        self.transforms = transforms
+
     # For distributed training, ran only once on single gpu
     def prepare_data(self):
         pass
 
     def setup(self, stage=None):
         if self.stage == 'fit' or self.stage == None:
-            train_transforms = get_riadd_train_transforms(self.img_size)
+            train_transforms, valid_transforms = get_transformations(self.transforms, self.img_size)
+
             self.train_dataset = get_dataset(df_data=self.df_train, img_path=self.train_img_path, transforms=train_transforms, start_col=self.start_col_labels)
-            
-            val_transforms = get_riadd_valid_transforms(self.img_size)
-            self.val_dataset = get_dataset(df_data=self.df_val, img_path=self.val_img_path, transforms=val_transforms, start_col=self.start_col_labels)
+            self.val_dataset = get_dataset(df_data=self.df_val, img_path=self.val_img_path, transforms=valid_transforms, start_col=self.start_col_labels)
 
         if self.stage == 'test' or self.stage == None:
             test_transforms = get_riadd_test_transforms(self.img_size, self.use_tta)
