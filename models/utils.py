@@ -3,6 +3,7 @@ import timm
 import torch.nn as nn
 import numpy as np
 import torch.optim as op
+from torch_poly_lr_decay import PolynomialLRDecay
 
 from loss.AsymetricLoss import AsymmetricLossOptimized
 from optimizer.ranger21 import Ranger21
@@ -34,13 +35,13 @@ def create_model(model_name, n_classes, input_size, pretrained=True, requires_gr
     return model
 
 
-def get_loss_function(loss, weights=[]):
+def get_loss_function(loss, weights=None):
     if loss == 'ASL':
         return AsymmetricLossOptimized(gamma_neg=2, gamma_pos=1)
     if loss == 'BCE':
         return nn.BCEWithLogitsLoss()
     if loss == 'WBCE':
-        if len(weights) == 0:
+        if weights is None:
             weights = np.ones(34)
         return nn.BCEWithLogitsLoss(pos_weight=torch.from_numpy(weights))
 
@@ -56,4 +57,18 @@ def get_optimizer(optimizer, params, lr):
         return Ranger(params, lr)
     if optimizer == 'Ranger21':
         return Ranger21(params, lr, num_batches_per_epoch=163, num_epochs=100, use_madgrad=True)
+
+
+def get_lr_scheduler(lr_scheduler, optimizer, monitor, threshold):
+    sch = {}
+    if lr_scheduler == 'reducelronplateau':
+        sch['scheduler'] = op.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, verbose=True, threshold=threshold)
+    elif lr_scheduler == 'polynomiallrdecay':
+        sch['scheduler'] = PolynomialLRDecay(optimizer, max_decay_steps=50, end_learning_rate=0.0001, power=0.9)
+    else:
+        print('Scheduler ', lr_scheduler, 'not supported')
+        exit(0)
+
+    sch['monitor'] = monitor
+    return sch
     

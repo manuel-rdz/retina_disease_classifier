@@ -5,7 +5,6 @@ from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor, EarlyStopping
 from resampling import utils as res_utils
 
-
 import pandas as pd
 import numpy as np
 import argparse
@@ -14,7 +13,6 @@ import os
 import time
 import random
 import config
-
 
 config_parser = parser = argparse.ArgumentParser(description='Training Config', add_help=False)
 parser.add_argument('-c', '--config', default='', type=str, metavar='FILE',
@@ -40,16 +38,23 @@ parser.add_argument('--gpus', default=1, help='number of gpus to use for trainin
 parser.add_argument('--auto_gpus', default=False, help='let pytorch check how many gpus there are available')
 parser.add_argument('--pin_memory', default=False, help='pin memory for dataloader')
 parser.add_argument('--epochs', default=50, help='number of epochs to run')
-parser.add_argument('--auto_batch_size', default=False, help='use pl function to find automatically the biggest batch size possible')
+parser.add_argument('--auto_batch_size', default=False,
+                    help='use pl function to find automatically the biggest batch size possible')
 parser.add_argument('--auto_lr', default=False, help='use pl function to find automtically the best initial lr')
 parser.add_argument('--limit_train_batches', default=1.0, help='limit the number of batches to use during trainig')
-parser.add_argument('--limit_val_batches', default=1.0, help='limit the number of validation batches to use during training')
-parser.add_argument('--resampling', default='None', help='Name of the resampling algorithm to be applied on the dataset')
+parser.add_argument('--limit_val_batches', default=1.0,
+                    help='limit the number of validation batches to use during training')
+parser.add_argument('--resampling', default='None',
+                    help='Name of the resampling algorithm to be applied on the dataset')
 parser.add_argument('--resampling_percentage', default=10, help='Percentage of resampling the dataset')
 parser.add_argument('--folds', default=5, help='Folds to train')
 parser.add_argument('--loss', default='ASL', help='Loss function to use for the model training')
 parser.add_argument('--optimizer', default='Adam', help='Optimizer to use during training')
 parser.add_argument('--scheduler_threshold', default=1e-4, help='min threshold value for schedulers')
+parser.add_argument('--transforms', default='riadd', help='Choose which transformations to use for data augmentation')
+parser.add_argument('--automatic_optimization', default=True, help='Use pytorch lightning automatic optimizer')
+parser.add_argument('--lr_scheduler', default='reducelronplateau', help='LR scheduler for training')
+
 
 def _parse_args():
     # Do we have a config file to parse?
@@ -67,6 +72,7 @@ def _parse_args():
     args_text = yaml.safe_dump(args.__dict__, default_flow_style=False)
     return args, args_text
 
+
 def create_output_folder():
     # Added random number to avoid collisions duing running on server
     random.seed(time.perf_counter_ns())
@@ -77,22 +83,24 @@ def create_output_folder():
     os.makedirs(output_path, exist_ok=True)
     return output_path
 
+
 def get_class_weights(y_true):
     y_pos = np.sum(y_true, axis=0)
     weights = y_pos.max() / y_pos
 
     return np.array(weights)
 
+
 def save_train_val_idxs(train_idx, val_idx, path):
     np.savetxt(os.path.join(path, 'val_idx.csv'),
-    val_idx,
-    delimiter=', ',
-    fmt='% s')
+               val_idx,
+               delimiter=', ',
+               fmt='% s')
 
     np.savetxt(os.path.join(path, 'train_idx.csv'),
-    train_idx,
-    delimiter=', ',
-    fmt='% s')
+               train_idx,
+               delimiter=', ',
+               fmt='% s')
 
 
 def train_model(train_x, train_y, val_x, val_y, out_path):
@@ -100,13 +108,13 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         logging_interval='step',
         log_momentum=True,
     )
-    
+
     early_stopping = EarlyStopping(
-        monitor='avg_val_loss', 
-        patience=17, 
+        monitor='avg_val_loss',
+        patience=17,
         verbose=True,
-        min_delta=args.scheduler_threshold, 
-        mode='min') 
+        min_delta=args.scheduler_threshold,
+        mode='min')
 
     checkpoint = ModelCheckpoint(
         monitor="avg_val_loss",
@@ -117,7 +125,7 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
     )
 
     model = RetinaClassifier(
-        model_name=args.model, 
+        model_name=args.model,
         n_classes=args.num_classes,
         input_size=args.img_size,
         lr=args.lr,
@@ -125,19 +133,21 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         optimizer=args.optimizer,
         threshold=args.scheduler_threshold,
         output_path=out_path,
-        weights=get_class_weights(train_y)
+        weights=get_class_weights(train_y),
+        automatic_optimization=args.automatic_optimization,
+        lr_scheduler=args.lr_scheduler,
     )
 
     trainer = Trainer(
         gpus=args.gpus,
         auto_select_gpus=args.auto_gpus,
         auto_scale_batch_size=args.auto_batch_size,
-        auto_lr_find=args.auto_lr, 
+        auto_lr_find=args.auto_lr,
         deterministic=True,
-        precision=16, 
+        precision=16,
         max_epochs=args.epochs,
-        callbacks=[checkpoint, lr_monitor, early_stopping], 
-        limit_train_batches=args.limit_train_batches, 
+        callbacks=[checkpoint, lr_monitor, early_stopping],
+        limit_train_batches=args.limit_train_batches,
         limit_val_batches=args.limit_val_batches)
 
     data_module = RetinaDataModule(
@@ -174,7 +184,7 @@ if __name__ == '__main__':
     args_file = open(os.path.join(output_dir, 'args.yaml'), 'w')
     args_file.write(args_text)
     args_file.close()
-    
+
     if args.folds == 0:
         train_data = pd.DataFrame(np.empty(0))
         val_data = pd.DataFrame(np.empty(0))
@@ -206,10 +216,10 @@ if __name__ == '__main__':
 
         val_x = val_data.iloc[:, :args.start_col]
         val_y = val_data.iloc[:, args.start_col:]
-        
+
         train_x, train_y = res_utils.resample_dataset(train_x, train_y, args.resampling, args.resampling_percentage)
 
-        train_model(train_x, train_y, val_x, val_y, fold_path)    
+        train_model(train_x, train_y, val_x, val_y, fold_path)
     else:
         folds = MultilabelStratifiedKFold(n_splits=args.folds, shuffle=True, random_state=args.seed)
 
