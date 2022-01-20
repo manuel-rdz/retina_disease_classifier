@@ -1,18 +1,26 @@
 from sklearn.metrics import roc_auc_score, average_precision_score, precision_score, recall_score, f1_score
 
 import numpy as np
-
 import math
+
 
 def __calculate_metric(y_true, y_pred, metric):    
     if len(y_true.shape) == 1:
-        score = metric(y_true, y_pred)
-        return score, [score]
+        try:
+            score = metric(y_true, y_pred)
+            if not math.isnan(score):
+                return score, [score]
+            else:
+                print('normal col returned nan')
+        except Exception as e:
+            print('normal col', e)
+
+        return 0.0, [0.0]
 
     scores = []
     for i in range(y_true.shape[1]):
         try:
-            score = metric(y_true[:,i], y_pred[:,i])
+            score = metric(y_true[:, i], y_pred[:, i])
             if not math.isnan(score):
                 scores.append(score)
             else:
@@ -26,7 +34,6 @@ def __calculate_metric(y_true, y_pred, metric):
 def calculate_metric(y_true, y_pred, metric):
     metric = metric.lower()
     y_pred_bin = (y_pred > 0.5)
-    #print('Errors for metric ', metric)
 
     if metric == 'auc':
         return __calculate_metric(y_true, y_pred, roc_auc_score)
@@ -52,6 +59,7 @@ def get_short_metrics_message(bin_auc, bin_f1, labels_auc, labels_map, labels_f1
     msg += '{}\n{}\n{}\n{}\n{}\n{}\n{}'.format(labels_auc, labels_map, labels_f1, bin_auc, bin_f1, ml_score, model_score)
 
     return msg
+
 
 def get_full_metrics_message(bin_auc, bin_f1, labels_auc, labels_map, labels_f1):
     ml_score = (labels_auc + labels_map) / 2.0

@@ -1,6 +1,7 @@
 import os
 import cv2
 import numpy as np
+import torch
 import torch.utils.data as data
 
 
@@ -65,20 +66,9 @@ class MergedDataset(data.Dataset):  # for training/testing
             imgId = str(imgId) + '.png'
             dataset_idx = 3
 
-        if self.only_disease == True:
-            label_2 = self.image_ids.iloc[index, 2:].values.astype(np.int64)
-            label_2 = sum(label_2)
-            label = self.image_ids.iloc[index, 1:2].values.astype(np.int64)
-            if label_2 > 0:
-                label = np.append(label, 1)
-            else:
-                label = np.append(label,0)
-        else:
-            label = self.image_ids.iloc[index, self.start_col_labels:].values.astype(np.int64)
+        label = self.image_ids.iloc[index, self.start_col_labels:].values.astype(np.int64)
         imgpath = os.path.join(self.img_path[dataset_idx], imgId)
-        #print('Tying to open image: ', imgpath)
         img = cv2.imread(imgpath)
-        #img = crop_maskImg(img)
         try:
             img = img[:, :, ::-1]
         except:

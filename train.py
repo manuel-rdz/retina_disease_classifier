@@ -145,6 +145,7 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         auto_lr_find=args.auto_lr,
         deterministic=True,
         precision=16,
+        gradient_clip_val=0.5,
         max_epochs=args.epochs,
         callbacks=[checkpoint, lr_monitor, early_stopping],
         limit_train_batches=args.limit_train_batches,

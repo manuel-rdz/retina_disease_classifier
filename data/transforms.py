@@ -41,6 +41,70 @@ def get_vgg16_train_transforms(image_size):
     return transforms_train
 
 
+def get_efficientnet_train_transforms(image_size):
+    return a.Compose([
+        a.Resize(image_size, image_size),
+        a.HorizontalFlip(p=0.5),
+        a.VerticalFlip(p=0.5),
+        a.OneOf([
+            a.Rotate(limit=(45, 45)),
+            a.Rotate(limit=(90, 90)),
+        ]),
+        a.Affine(translate_percent=(0, 30), fit_output=True),
+        a.CLAHE(p=1.0),
+        a.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225],
+        ),
+        ToTensorV2(),
+    ])
+
+
+def get_efficientnet_gray_train_transforms(image_size):
+    return a.Compose([
+        a.Resize(image_size, image_size),
+        a.ToGray(),
+        a.HorizontalFlip(p=0.5),
+        a.VerticalFlip(p=0.5),
+        a.OneOf([
+            a.Rotate(limit=(45, 45)),
+            a.Rotate(limit=(90, 90)),
+        ]),
+        a.Affine(translate_percent=(0, 30), fit_output=True),
+        a.CLAHE(p=1.0),
+        a.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225],
+        ),
+        ToTensorV2(),
+    ])
+
+
+def get_efficientnet_valid_transforms(image_size):
+    return a.Compose([
+        a.Resize(image_size, image_size),
+        #a.CLAHE(p=1.0),
+        a.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225],
+        ),
+        ToTensorV2(),
+    ])
+
+
+def get_efficientnet_gray_valid_transforms(image_size):
+    return a.Compose([
+        a.Resize(image_size, image_size),
+        a.ToGray(),
+        #a.CLAHE(p=1.0),
+        a.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225],
+        ),
+        ToTensorV2(),
+    ])
+
+
 def get_riadd_train_transforms(image_size):
     transforms_train = a.Compose([
         #a.RandomResizedCrop(image_size, image_size, scale=(0.85, 1), p=1),

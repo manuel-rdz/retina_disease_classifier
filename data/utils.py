@@ -16,6 +16,9 @@ def get_transformations(transforms, img_size):
     elif transforms == 'resnet':
         train_transforms = t.get_resnet_train_transforms(img_size)
         val_transforms = t.get_resnet_valid_transforms(img_size)
+    elif transforms == 'efficientnet':
+        train_transforms = t.get_efficientnet_gray_train_transforms(img_size)
+        val_transforms = t.get_efficientnet_gray_valid_transforms(img_size)
     else:
         train_transforms = t.get_riadd_train_transforms(img_size)
         val_transforms = t.get_riadd_valid_transforms(img_size)

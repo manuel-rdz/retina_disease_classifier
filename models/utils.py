@@ -12,7 +12,7 @@ from pytorch_ranger import Ranger
 
 def create_model(model_name, n_classes, input_size, pretrained=True, requires_grad=False):
 
-    if any(name in model_name for name in ['beit', 'vgg16', 'resnet101']):
+    if any(name in model_name for name in ['beit', 'vgg16', 'resnet101', 'efficientnet_b3']):
         model = timm.create_model(model_name, pretrained=pretrained)
     else:
         model = timm.create_model(model_name, pretrained=pretrained, img_size=input_size)
@@ -71,4 +71,3 @@ def get_lr_scheduler(lr_scheduler, optimizer, monitor, threshold):
 
     sch['monitor'] = monitor
     return sch
-    
