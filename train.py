@@ -54,6 +54,7 @@ parser.add_argument('--scheduler_threshold', default=1e-4, help='min threshold v
 parser.add_argument('--transforms', default='riadd', help='Choose which transformations to use for data augmentation')
 parser.add_argument('--automatic_optimization', default=True, help='Use pytorch lightning automatic optimizer')
 parser.add_argument('--lr_scheduler', default='reducelronplateau', help='LR scheduler for training')
+parser.add_argument('--trainable_base', default=False, help='Set requires_grad parameter to the model base')
 
 
 def _parse_args():
@@ -136,6 +137,7 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         weights=get_class_weights(train_y),
         automatic_optimization=args.automatic_optimization,
         lr_scheduler=args.lr_scheduler,
+        requires_grad=args.trainable_base,
     )
 
     trainer = Trainer(

@@ -49,7 +49,7 @@ class RetinaDataModule(pl.LightningDataModule):
                                            start_col=self.start_col_labels)
 
         if self.stage == 'test' or self.stage is None:
-            test_transforms = get_riadd_test_transforms(self.img_size, self.use_tta)
+            _, test_transforms = get_transformations(self.transforms, self.img_size)
             self.test_dataset = get_dataset(df_data=self.df_test, img_path=self.test_img_path,
                                             transforms=test_transforms, start_col=self.start_col_labels)
 

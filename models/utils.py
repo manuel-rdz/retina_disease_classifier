@@ -12,7 +12,7 @@ from pytorch_ranger import Ranger
 
 def create_model(model_name, n_classes, input_size, pretrained=True, requires_grad=False):
 
-    if any(name in model_name for name in ['beit', 'vgg16', 'resnet101', 'efficientnet_b3']):
+    if any(name in model_name for name in ['beit', 'vgg16', 'resnet101', 'efficientnet_b3', 'tf_efficientnet_b6_ns', 'tf_efficientnet_b5_ns']):
         model = timm.create_model(model_name, pretrained=pretrained)
     else:
         model = timm.create_model(model_name, pretrained=pretrained, img_size=input_size)
@@ -42,7 +42,7 @@ def get_loss_function(loss, weights=None):
         return nn.BCEWithLogitsLoss()
     if loss == 'WBCE':
         if weights is None:
-            weights = np.ones(34)
+            weights = np.ones(20)
         return nn.BCEWithLogitsLoss(pos_weight=torch.from_numpy(weights))
 
     return None

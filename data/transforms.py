@@ -83,7 +83,7 @@ def get_efficientnet_gray_train_transforms(image_size):
 def get_efficientnet_valid_transforms(image_size):
     return a.Compose([
         a.Resize(image_size, image_size),
-        #a.CLAHE(p=1.0),
+        a.CLAHE(p=1.0),
         a.Normalize(
             mean=[0.485, 0.456, 0.406],
             std=[0.229, 0.224, 0.225],

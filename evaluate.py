@@ -10,7 +10,7 @@ import config
 
 from data.modules import RetinaDataModule
 from models.models import RetinaClassifier
-from utils.metrics import get_metrics_message, get_scores 
+from utils.metrics import get_short_metrics_message, get_scores
 
 
 config_parser = parser = argparse.ArgumentParser(description='Training Config', add_help=False)
@@ -35,6 +35,7 @@ parser.add_argument('--output_path', help='path to output the generated csv')
 parser.add_argument('--folds', help='number of folds to use for cross validation')
 parser.add_argument('--gpus', default=1, help='number of gpus to use for evaluation')
 parser.add_argument('--auto_gpus', default=False, help='let pythorch check how many gpus are available')
+parser.add_argument('--transforms', default='riadd', help='testing transforms to apply')
 
 
 def _parse_args():
@@ -94,7 +95,6 @@ def get_predictions(model, data_module, tta):
 
 
 if __name__ == '__main__':
-    config.init()
     args, args_text = _parse_args()
 
     pl.seed_everything(args.seed)
@@ -129,6 +129,7 @@ if __name__ == '__main__':
                 pin_memory=args.pin_memory,
                 start_col_labels=args.start_col,
                 stage='test',
+                transforms=args.transforms,
             )
 
             fold_y_pred = get_predictions(model, data_module, args.tta)
@@ -148,7 +149,7 @@ if __name__ == '__main__':
 
     else:
         if len(glob.glob(os.path.join(args.model_path, 'fold_0', '*.csv'))) > 0:
-            test_idx = pd.read_csv(os.path.join(args.model_path, 'fold_0','val_idx.csv')).to_numpy(dtype=np.int32).squeeze()
+            test_idx = pd.read_csv(os.path.join(args.model_path, 'fold_0','val_idx.csv'), header=None).to_numpy(dtype=np.int32).squeeze()
         else:
             test_idx = np.arange(data.shape[0])
 
@@ -167,13 +168,15 @@ if __name__ == '__main__':
         )
 
         model_path = glob.glob(os.path.join(args.model_path, 'fold_0', '*.ckpt'))
+        if len(model_path) == 0:
+            model_path = glob.glob(os.path.join(args.model_path, 'fold_0', '*.pth.tar'))
 
         model = get_model(model_path[0], args.model_name, args.num_classes, args.img_size)
         y_pred = get_predictions(model, data_module, args.tta)
     
         avg_metrics, scores_auc, scores_map, scores_f1 = get_scores(y_true, y_pred, config.normal_column_idx)
 
-    message = get_metrics_message(*avg_metrics)
+    message = get_short_metrics_message(*avg_metrics)
 
     f = open(os.path.join(args.output_path, "final_scores.txt"), "w")
     f.write(message)

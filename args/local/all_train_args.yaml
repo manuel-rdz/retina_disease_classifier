@@ -12,16 +12,16 @@ val_imgs:
 test_imgs:
 output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\comparison\
 batch_size: 16
-lr: 0.007
+lr: 0.00001
 num_classes: 20
-model: resnet101
+model: deit_base_patch16_384
 #efficientnet_b3
 #vgg16
 #swin_base_patch4_window12_384_in22k
 #deit_base_patch16_384 
-#vit_base_patch16_384 
+#vit_base_patch16_384
 #efficientnet_b0
-img_size: 512
+img_size: 384
 start_col: 4
 experiment: 
 seed: 42
@@ -40,6 +40,7 @@ folds: 0
 loss: BCE
 optimizer: Adam
 scheduler_threshold: 0.0003
-transforms: resnet
+transforms: riadd
 automatic_optimization: True
-lr_scheduler: polynomiallrdecay
+lr_scheduler: reducelronplateau
+trainable_base: True
