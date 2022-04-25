@@ -151,7 +151,9 @@ def train_model(train_x, train_y, val_x, val_y, out_path):
         max_epochs=args.epochs,
         callbacks=[checkpoint, lr_monitor, early_stopping],
         limit_train_batches=args.limit_train_batches,
-        limit_val_batches=args.limit_val_batches)
+        limit_val_batches=args.limit_val_batches,
+        default_root_dir=args.output_path,
+    )
 
     data_module = RetinaDataModule(
         df_train=train_x.join(train_y),
@@ -219,6 +221,9 @@ if __name__ == '__main__':
 
         val_x = val_data.iloc[:, :args.start_col]
         val_y = val_data.iloc[:, args.start_col:]
+
+        print(np.array(train_y.sum()))
+        print(val_y.sum())
 
         train_x, train_y = res_utils.resample_dataset(train_x, train_y, args.resampling, args.resampling_percentage)
 

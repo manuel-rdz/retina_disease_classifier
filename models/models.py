@@ -11,7 +11,7 @@ import numpy as np
 
 
 class RetinaClassifier(pl.LightningModule):
-    def __init__(self, model_name, n_classes, input_size, loss='WBCE', optimizer='', lr_scheduler='',requires_grad=False, lr=0.001,
+    def __init__(self, model_name, n_classes, input_size, loss='BCE', optimizer='', lr_scheduler='',requires_grad=False, lr=0.001,
                  threshold=0.0005, weights=None, output_path='', automatic_optimization=True):
         super().__init__()
 

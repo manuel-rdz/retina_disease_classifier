@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=10
-#SBATCH --job-name=train
-#SBATCH --time=02:00:00
+#SBATCH --job-name=train_resnet
+#SBATCH --time=03:00:00
 #SBATCH --partition=gpu
 #SBATCH --account=kuex0005
-#SBATCH --output=train.%j.out
-#SBATCH --error=train.%j.err
+#SBATCH --output=train_resnet.%j.out
+#SBATCH --error=train_resnet.%j.err
 
 module purge
 module load gcc/9.3
@@ -26,5 +26,6 @@ pip install pytorch-lightning
 pip install scikit-multilearn
 pip install pytorch-ranger
 pip install -U iterative-stratification
+pip install git+https://github.com/cmpark0126/pytorch-polynomial-lr-decay.git
 
 python train.py -c args/server/all_train_args.yaml

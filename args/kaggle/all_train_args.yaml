@@ -1,0 +1,46 @@
+---
+train_data: /kaggle/input/merged-retina-datasets/merged_20_labels_drop_10.0_perc.csv
+val_data:
+train_imgs:
+- /kaggle/input/merged-retina-datasets/ARIA/all_images_crop
+- /kaggle/input/merged-retina-datasets/STARE/all_images_crop
+- /kaggle/input/merged-retina-datasets/RFMiD/Training
+val_imgs:
+- /kaggle/input/merged-retina-datasets/ARIA/all_images_crop
+- /kaggle/input/merged-retina-datasets/STARE/all_images_crop
+- /kaggle/input/merged-retina-datasets/RFMiD/Training
+test_imgs:
+output_path: /kaggle/working
+batch_size: 16
+lr: 0.00001
+num_classes: 20
+model: beit_base_patch16_384
+#efficientnet_b3
+#vgg16
+#swin_base_patch4_window12_384_in22k
+#deit_base_patch16_384 
+#vit_base_patch16_384
+#efficientnet_b0
+img_size: 384
+start_col: 4
+experiment: 
+seed: 42
+num_workers: 2
+pin_memory: True
+epochs: 200
+gpus: 1
+auto_gpus: False
+auto_batch_size: False
+auto_lr: False
+limit_train_batches: 1.0
+limit_val_batches: 1.0
+resampling: ml_ros
+resampling_percentage: 0
+folds: 0
+loss: BCE
+optimizer: Adam
+scheduler_threshold: 0.0003
+transforms: riadd
+automatic_optimization: True
+lr_scheduler: reducelronplateau
+trainable_base: True

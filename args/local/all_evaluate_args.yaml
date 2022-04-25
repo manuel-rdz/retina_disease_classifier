@@ -4,12 +4,12 @@ test_imgs:
 - C:\Users\AI\Desktop\student_Manuel\datasets\ARIA\all_images_crop
 - C:\Users\AI\Desktop\student_Manuel\datasets\STARE\all_images_crop
 - C:\Users\AI\Desktop\student_Manuel\datasets\RIADD_cropped\Training_Set\Training
-model_path: C:\Users\AI\Desktop\student_Manuel\papers\comparison\RIADD_winner\small_model
-output_path: C:\Users\AI\Desktop\student_Manuel\papers\comparison\RIADD_winner\small_model
-model_name: tf_efficientnet_b5_ns
+model_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_subsets\swin
+output_path: C:\Users\AI\Desktop\student_Manuel\codes\trained_models\merged_subsets\swin
+model_name: swin_base_patch4_window12_384_in22k
 batch_size: 8
 num_classes: 20
-img_size: 540
+img_size: 384
 start_col: 4
 seed: 42
 num_workers: 2
